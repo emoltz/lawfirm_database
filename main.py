@@ -13,6 +13,14 @@ def load_lottieurl(url):
     return r.json()
 
 
+# local CSS
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+
+local_css("style.css")
+
 lottie_coding = load_lottieurl("https://assets3.lottiefiles.com/packages/lf20_w51pcehl.json")
 
 with st.container():
@@ -30,3 +38,13 @@ with st.container():
     with right_column:
         st.write("Right column")
         st_lottie(lottie_coding)
+
+with st.container():
+    st.write("---")
+    st.header("My projects")
+    st.write("##")
+    image_column, text_column = st.columns((1, 2))
+    with image_column:
+        pass
+    with text_column:
+        st.subheader("Subheader")
