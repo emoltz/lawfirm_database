@@ -5,9 +5,9 @@ create table Cases
     date_closed date                not null,
     paid        boolean,
     verdict     varchar(128),
-    managed_by  varchar(128) unique not null,
+    managed_by  varchar(128)  not null,
     foreign key (managed_by) references Lawyers (lid),
-    presided_by integer unique      not null,
+    presided_by integer             not null,
     foreign key (presided_by) references Judges (judgeid)
 );
 
@@ -26,6 +26,7 @@ create table part_of
 (
     client_id integer not null,
     case_id   integer not null,
+    primary key (client_id, case_id),
     foreign key (client_id) references Clients (cid),
     foreign key (case_id) references Cases (case_id)
 );
@@ -78,7 +79,7 @@ create table Paralegals
     firstname        char(128)        not null,
     lastname         char(128)        not null,
     unique (firstname, lastname, pid),
-    assigned_to_case integer unique,
+    assigned_to_case integer,
     foreign key (assigned_to_case) references Cases (case_id)
 );
 
@@ -88,14 +89,6 @@ create table Research
     text     char(500),
     citation char(128)
 );
-
-create table Research
-(
-    rid      integer primary key,
-    text     char(500),
-    citation char(128)
-);
-
 
 create table Contacts_related_to
 (
