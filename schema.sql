@@ -6,8 +6,8 @@ create table Cases
     paid        boolean,
     verdict     varchar(128),
     managed_by  varchar(128)  not null,
-    foreign key (managed_by) references Lawyers (lid),
     presided_by integer             not null,
+    foreign key (managed_by) references Lawyers (lid),
     foreign key (presided_by) references Judges (judgeid)
 );
 
