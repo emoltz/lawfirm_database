@@ -8,7 +8,7 @@
       <jdbc-url>jdbc:postgresql://jedi.poly.edu:5432/es5541_db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="lawfirm_local" uuid="76d41139-9ddc-47af-bbd0-1b28ee99d590">
+    <data-source source="LOCAL" name="lawfirm_db" uuid="f04259e8-13d4-4bc3-b459-7d16a10efbd5">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
