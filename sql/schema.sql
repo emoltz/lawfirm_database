@@ -5,7 +5,7 @@ create table Cases
     date_closed date                not null,
     paid        boolean,
     verdict     varchar(128),
-    managed_by  varchar(128)  not null,
+    managed_by  integer  not null,
     presided_by integer             not null,
     foreign key (managed_by) references Lawyers (lid),
     foreign key (presided_by) references Judges (judgeid)
@@ -66,8 +66,7 @@ create table Judges
     court     char(180),
     judgeid   integer primary key,
     firstname varchar(128),
-    lastname  varchar(128),
-    primary key (firstname, lastname)
+    lastname  varchar(128)
 
 );
 
