@@ -1,9 +1,13 @@
 import psycopg2
 import streamlit as st
-import pandas as pd
 
-st.write("Here's our first attempt at using data to create a table:")
-st.write(pd.DataFrame({
-    'first column': [1, 2, 3, 4],
-    'second column': [10, 20, 30, 40]
-}))
+st.set_page_config(page_title="Lawfirm Database", page_icon=":card_index:")
+
+# local CSS
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+
+local_css("static/styles.css")
+st.write("This app is all set up!")
