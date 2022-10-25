@@ -5,6 +5,13 @@ from streamlit_lottie import st_lottie
 
 st.set_page_config(page_title="Test", page_icon=":smile:", layout='wide')
 
+# local CSS
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+
+local_css("style.css")
 
 def load_lottieurl(url):
     r = requests.get(url)
@@ -13,13 +20,6 @@ def load_lottieurl(url):
     return r.json()
 
 
-# local CSS
-def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-
-local_css("style.css")
 
 lottie_coding = load_lottieurl("https://assets3.lottiefiles.com/packages/lf20_w51pcehl.json")
 
