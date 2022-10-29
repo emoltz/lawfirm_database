@@ -7,7 +7,7 @@ st.set_page_config(page_title="Lawfirm Database", page_icon=":card_index:")
 # local CSS
 def local_css(file_name):
     with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
 local_css("static/styles.css")
@@ -34,6 +34,4 @@ def run_query(query):
 rows = run_query("SELECT * from lawyers;")
 
 for row in rows:
-    st.write(
-        f"{row[0]}'s name is: {row[1]}"
-    )
+    st.write(f"{row[0]}'s name is: {row[1]}")
