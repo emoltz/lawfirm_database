@@ -35,6 +35,12 @@ class FakeLawfirm:
             print(lawyer.firstname, lawyer.lastname, lawyer.title, lawyer.email, lawyer.specialty, lawyer.rate_per_hour)
 
 
-
 lawfirm = FakeLawfirm()
-lawfirm.print_lawyers()
+# lawfirm.print_lawyers()
+
+conn = psycopg2.connect(**st.secrets["postgres"])
+cur = conn.cursor()
+for lawyer in lawfirm.list_of_lawyers:
+    cur.execute(
+        f"INSERT INTO lawyers (lid, firstname, lastname, title, email, specialty, rate_per_hour) VALUES ('{lawyer.lid}', '{lawyer.firstname}', '{lawyer.lastname}', '{lawyer.title}','{lawyer.email}','{lawyer.specialty}','{lawyer.rate_per_hour}')")
+    conn.commit()
