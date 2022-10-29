@@ -59,12 +59,66 @@ class FakeClient:
         self.phone = fake.random_int(min=1111111, max=9999999)
 
 
+class FakeParalegal:
+    pid = 0
+    rate_per_hour = 0
+    speciality = ""
+    firstname = ""
+    lastname = ""
+    assigned_to_case = 0
+
+    def __init__(self):
+        fake = Faker()
+        self.pid = fake.unique.random_int(min=20000, max=30000)
+        self.rate_per_hour = fake.random_int(min=1, max=500)
+        self.speciality = fake.word()
+        self.firstname = fake.first_name()
+        self.lastname = fake.last_name()
+
+
+class FakeJudge:
+    court = ""
+    judge_id = 0
+    firstname = ""
+    lastname = ""
+
+    def __init__(self):
+        fake = Faker()
+        self.court = fake.word()
+        self.judge_id = fake.unique.random_int(min=30000, max=40000)
+        self.firstname = fake.first_name()
+        self.lastname = fake.last_name()
+
+
 # DB CONNECTION
 conn = psycopg2.connect(**st.secrets["postgres"])
 cur = conn.cursor()
 
 
 # FUNCTIONS:
+
+def populate_judge_table():
+    judge_list = []
+    for _ in range(5):
+        judge_list.append(FakeJudge())
+    for judge in judge_list:
+        cur.execute(
+            f"INSERT INTO judges (court, judgeid, firstname, lastname) VALUES ('{judge.court}', '{judge.judge_id}', '{judge.firstname}','{judge.lastname}')"
+        )
+        conn.commit()
+
+
+def populate_paralegal_table(number_of_paralegals=5):
+    paralegal_list = []
+    for _ in range(number_of_paralegals):
+        paralegal_list.append(FakeParalegal())
+    for paralegal in paralegal_list:
+        cur.execute(
+            f"INSERT INTO paralegals (pid, rate_per_hour, specialty, firstname, lastname) VALUES ('{paralegal.pid}', '{paralegal.rate_per_hour}', '{paralegal.speciality}', '{paralegal.firstname}','{paralegal.lastname}')"
+        )
+        conn.commit()
+
+
 def gen_client_list(number_of_clients=100):
     client_list = []
     for _ in range(number_of_clients):
@@ -91,5 +145,7 @@ def populate_laywer_table():
 
 
 # SCRIPTS:
-# populate_laywer_table()
-# populate_client_table()
+populate_laywer_table()
+populate_client_table()
+populate_paralegal_table()
+populate_judge_table()
