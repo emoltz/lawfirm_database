@@ -36,11 +36,15 @@ with dataset:
     # data = pd.read_csv('sample_data/sample_data.csv')
     st.write(data)
 
+
 with features:
     # section
     st.header("Features I created")
     st.text("Some features")
+    st.markdown('* **feature1**: description')
 
 with model_training:
     st.header("Model Training")
     st.text("Description")
+    sel_col, disp_col = st.columns(2)
+    sel_col.slider("What should be the max_depth?", min_value=1, max_value=10)
