@@ -75,7 +75,7 @@ with model_training:
     st.text("Use the slider to select the year")
     sel_col, disp_col = st.columns(2)
     sel_col.slider("What year are you searching?", min_value=2010,
-                   max_value=2020) # doesn't move?
+                   max_value=2020)
 
     # Drop-down menu, maybe for sorting the results?
     n_estimators = sel_col.selectbox('Sort by:', options=[100,200,300,400,'no limit'], index=0)
