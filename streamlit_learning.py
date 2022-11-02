@@ -44,15 +44,16 @@ data = pd.DataFrame(run_query("SELECT * "
 # Sidebar menu!!
 with st.sidebar:
     selected = option_menu(
-        menu_title="Main Menu title", #required
-        options=["Home", "Lawyers", "Cases", "Clients", "Research", "etc"],     #required
+        menu_title="Menu", #required
+        options=["Home", "Lawyers", "Cases", "Clients", "Research", "etc"], #required
         default_index=0
     )
-# ------------ Home or beginning of app ------------
+
+# ------------------------------------------- Home or beginning of app -------------------------------------------
 if selected == "Home":
     with header:
         st.title("Welcome to the Lawfirm!")
-        st.text('In this project, I will look into a lawfirm database')
+        st.text('Please use the left menu to navigate these pages')
 
         # trying to create a dialogue box up top for writing queries
         # sel_col = st.columns(1)
@@ -77,14 +78,14 @@ if selected == "Home":
         selected_element = st.selectbox("Pick an item", ("item1", "item2", "item3"))
         st.write(selected_element)
 
-# ------------ Lawyers ------------
+# ------------------------------------------- Lawyers -------------------------------------------
 if selected == "Lawyers":
     st.title(f"You have selected {selected}")
     with header:
         st.header("Lawyers")
         st.write(":heavy_minus_sign:" * 35)
 
-# ------------ Cases ------------
+# ------------------------------------------- Cases -------------------------------------------
 if selected == "Cases":
     with header:
         st.header("Cases")
@@ -107,10 +108,21 @@ if selected == "Cases":
         threshold = st.slider("What year was the case closed?", min_value=2010, max_value=2022, value=2010, step=1)
         st.write(threshold)
 
-# ------------ Clients ------------
+# ------------------------------------------- Clients -------------------------------------------
 if selected == "Clients":
     st.title(f"You have selected {selected}")
     st.header("Clients")
+    with header:
+        st.header("Clients")
+        st.write(":heavy_minus_sign:" * 35)
+
+# ------------------------------------------- Research -------------------------------------------
+if selected == "Research":
+    st.title(f"You have selected {selected}")
+    st.header("Research")
+    with header:
+        st.header("Research")
+        st.write(":heavy_minus_sign:" * 35)
 
 
 with dataset:
