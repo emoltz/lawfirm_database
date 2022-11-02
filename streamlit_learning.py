@@ -96,7 +96,7 @@ if selected == "Cases":
         # Radio buttons for what case is related to, should have more options:
         genre = st.radio(
             "What topic was your case related to?",
-            ('real estate', 'contract', 'divorce'))
+            ('real estate', 'contract', 'divorce'), key=0)
 
         if genre == 'real estate':
             st.write('You selected real estate.')
