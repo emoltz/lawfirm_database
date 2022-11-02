@@ -32,7 +32,7 @@ data = pd.DataFrame(run_query("SELECT * "
                                                                 2: "lastname", 3: "title",
                                                                 4: "email", 5: "specialty",
                                                                 6: "rate_per_hour"})
-# Sidebar for a menu, breaks everything
+# Sidebar for a menu <--- breaks everything
 # with st.sidebar:
 #     with st.echo():
 #         st.write("This code will be printed to the sidebar.")
@@ -52,7 +52,7 @@ with st.sidebar:
 # ------------------------------------------- Home or beginning of app -------------------------------------------
 if selected == "Home":
     with header:
-        st.title("Welcome to the Lawfirm!")
+        st.title("Welcome to Ethan & Julie's Lawfirm!")
         st.text('Please use the left menu to navigate these pages')
 
         # trying to create a dialogue box up top for writing queries
@@ -80,11 +80,18 @@ if selected == "Home":
 
 # ------------------------------------------- Lawyers -------------------------------------------
 if selected == "Lawyers":
-    st.title(f"You have selected {selected}")
+    #st.title(f"You have selected {selected}")
     with header:
         st.header("Lawyers")
         st.write(":heavy_minus_sign:" * 35)
-
+        lefthand_col, somethingelse_col = st.columns(2)
+        # Drop-down menu example
+        lawyer_dropdown_col = lefthand_col.selectbox('Select a lawyer you want to search for:', options=[
+                                                                                 'Ethan',
+                                                                                 'Julie',
+                                                                                 "Sharon",
+                                                                                 "Julia",
+                                                                                 'no limit'], index=0)
 # ------------------------------------------- Cases -------------------------------------------
 if selected == "Cases":
     with header:
@@ -94,19 +101,22 @@ if selected == "Cases":
         # another divider line
         st.markdown("""<hr style="height:5px;border:none;color:#222;background-color:#333;" /> """,
                     unsafe_allow_html=True)
-        # Radio buttons for what case is related to, should have more options:
-        genre = st.radio(
-            "What topic was your case related to?",
-            ('real estate', 'contract', 'divorce'), key=0)
+        col1, col2 = st.columns(2)
+        # Radio buttons for what case is related to, should have more options: (in left-hand column)
+        with col1:
+            genre = st.radio(
+                "What topic was your case related to?",
+                ('real estate', 'contract', 'divorce'), key=0)
 
-        if genre == 'real estate':
-            st.write('You selected real estate.')
-        else:
-            st.write("You didn't select real estate.")
+            if genre == 'real estate':
+                st.write('You selected real estate.')
+            else:
+                st.write("You didn't select real estate.")
 
-        # Another way to incorporate a slider
-        threshold = st.slider("What year was the case closed?", min_value=2010, max_value=2022, value=2010, step=1)
-        st.write(threshold)
+        # Another way to incorporate a slider (in right-hand column)
+        with col2:
+            threshold = st.slider("What year was the case closed?", min_value=2010, max_value=2022, value=2010, step=1)
+            st.write(threshold)
 
 # ------------------------------------------- Clients -------------------------------------------
 if selected == "Clients":
@@ -115,14 +125,20 @@ if selected == "Clients":
     with header:
         st.header("Clients")
         st.write(":heavy_minus_sign:" * 35)
+        # collecting number inputs, looking for cid
+        client_id_input = st.number_input("Search for a client by their ID", min_value=0, max_value=500, value=50, step=1)
+
 
 # ------------------------------------------- Research -------------------------------------------
 if selected == "Research":
-    st.title(f"You have selected {selected}")
-    st.header("Research")
+    # st.title(f"You have selected {selected}")
+    # st.header("Research")
     with header:
         st.header("Research")
         st.write(":heavy_minus_sign:" * 35)
+        # dialogue box with a default value of 'lid', remove to set default to be empty
+        input_feature = st.text_input('Type in what research document you want:', 'Contract 152', key =0)
+
 
 
 with dataset:
@@ -144,9 +160,6 @@ with model_training:
     sel_col, disp_col = st.columns(2)
     # sel_col.slider("What year are you searching?", min_value=2010,
     #                max_value=2020, step= 1)
-
-    # Drop-down menu example
-    n_estimators = sel_col.selectbox('Sort by:', options=[100,200,300,400,'no limit'], index=0)
 
     # dialogue box with a default value of 'lid', remove to set default to be empty
     input_feature = sel_col.text_input('Which feature should be used as input feature?', 'lid')
