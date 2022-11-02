@@ -1,6 +1,10 @@
+from datetime import time
+
 import streamlit as st
 import pandas as pd
 import psycopg2
+import streamlit.components.v1 as components
+from streamlit_option_menu import option_menu
 
 header = st.container()
 dataset = st.container()
@@ -28,33 +32,86 @@ data = pd.DataFrame(run_query("SELECT * "
                                                                 2: "lastname", 3: "title",
                                                                 4: "email", 5: "specialty",
                                                                 6: "rate_per_hour"})
+# Sidebar for a menu, breaks everything
+# with st.sidebar:
+#     with st.echo():
+#         st.write("This code will be printed to the sidebar.")
+#
+#     with st.spinner("Loading..."):
+#         time.sleep(5)
+#     st.success("Done!")
 
-with header:
-    st.title("Welcome!")
-    st.text('In this project, I will look into a lawfirm database')
-
-    # trying to create a dialogue box up top for writing queries
-    #sel_col = st.columns(1)
-    #input_feature = sel_col.text_input('Which feature should be used as input feature?', 'lid')
-    input_feature = st.text_input('What would you like to search for?'"")
-    st.markdown(f"Your input is : {input_feature}")
-
-    # collecting number inputs, perhaps for looking for lid, pid, cid
-    number_input = st.number_input("Enter a client id", min_value=0, max_value=500, value=50, step=1)
-
-    st.markdown(
-        f"""
-        * Query: {input_feature}
-        * ID value: {number_input}
-        """
+# Sidebar menu!!
+with st.sidebar:
+    selected = option_menu(
+        menu_title="Main Menu title", #required
+        options=["Home", "Lawyers", "Cases", "Clients", "Research", "etc"],     #required
+        default_index=0
     )
+# ------------ Home or beginning of app ------------
+if selected == "Home":
+    with header:
+        st.title("Welcome to the Lawfirm!")
+        st.text('In this project, I will look into a lawfirm database')
 
-    # Checkbox for a yes or no question
-    check_box_input = st.checkbox("Was this case closed?")
-    st.write(check_box_input)
+        # trying to create a dialogue box up top for writing queries
+        # sel_col = st.columns(1)
+        # input_feature = sel_col.text_input('Which feature should be used as input feature?', 'lid')
+        input_feature = st.text_input('What would you like to search for?'"")
+        st.markdown(f"Your input is : {input_feature}")
 
-    selected_element = st.selectbox("Pick an item", ("item1", "item2", "item3"))
-    st.write(selected_element)
+        # collecting number inputs, perhaps for looking for lid, pid, cid
+        number_input = st.number_input("Enter a client id", min_value=0, max_value=500, value=50, step=1)
+
+        st.markdown(
+            f"""
+            * Query: {input_feature}
+            * ID value: {number_input}
+            """
+        )
+
+        # Checkbox for a yes or no question
+        check_box_input = st.checkbox("Was this case closed?")
+        st.write(check_box_input)
+
+        selected_element = st.selectbox("Pick an item", ("item1", "item2", "item3"))
+        st.write(selected_element)
+
+# ------------ Lawyers ------------
+if selected == "Lawyers":
+    st.title(f"You have selected {selected}")
+    with header:
+        st.header("Lawyers")
+        st.write(":heavy_minus_sign:" * 35)
+
+# ------------ Cases ------------
+if selected == "Cases":
+    with header:
+        st.header("Cases")
+        # divider line
+        st.write(":heavy_minus_sign:" * 35)
+        # another divider line
+        st.markdown("""<hr style="height:5px;border:none;color:#222;background-color:#333;" /> """,
+                    unsafe_allow_html=True)
+        # Radio buttons for what case is related to, should have more options:
+        genre = st.radio(
+            "What topic was your case related to?",
+            ('real estate', 'contract', 'divorce'))
+
+        if genre == 'real estate':
+            st.write('You selected real estate.')
+        else:
+            st.write("You didn't select real estate.")
+
+        # Another way to incorporate a slider
+        threshold = st.slider("What year was the case closed?", min_value=2010, max_value=2022, value=2010, step=1)
+        st.write(threshold)
+
+# ------------ Clients ------------
+if selected == "Clients":
+    st.title(f"You have selected {selected}")
+    st.header("Clients")
+
 
 with dataset:
     # dataset section
@@ -71,22 +128,37 @@ with features:
     st.markdown('* **feature1**: description')
 
 with model_training:
-    st.header("Year selection, if known")
-    st.text("Use the slider to select the year")
-    sel_col, disp_col = st.columns(2)
-    sel_col.slider("What year are you searching?", min_value=2010,
-                   max_value=2020, step= 1000) # doesn't move?
 
-    # Drop-down menu, maybe for sorting the results?
+    sel_col, disp_col = st.columns(2)
+    # sel_col.slider("What year are you searching?", min_value=2010,
+    #                max_value=2020, step= 1)
+
+    # Drop-down menu example
     n_estimators = sel_col.selectbox('Sort by:', options=[100,200,300,400,'no limit'], index=0)
-    #dialogue box with a default value of 'lid', remove to set default to be empty
+
+    # dialogue box with a default value of 'lid', remove to set default to be empty
     input_feature = sel_col.text_input('Which feature should be used as input feature?', 'lid')
 
-    # Another way to incorporate a slider
-    threshold = st.slider("Pick a threshold:", min_value=1, max_value=100, value=50, step=1)
-    st.write(threshold)
 
 
-
+# with header:
+#     st.header("Cases")
+#     # divider line
+#     st.write(":heavy_minus_sign:" * 35)
+#     # another divider line
+#     st.markdown("""<hr style="height:5px;border:none;color:#222;background-color:#333;" /> """, unsafe_allow_html=True)
+#     # Radio buttons for what case is related to, should have more options:
+#     genre = st.radio(
+#         "What topic was your case related to?",
+#          ('real estate', 'contract', 'divorce'))
+#
+#     if genre == 'real estate':
+#         st.write('You selected real estate.')
+#     else:
+#         st.write("You didn't select real estate.")
+#
+#     # Another way to incorporate a slider
+#     threshold = st.slider("What year was the case closed?", min_value=2010, max_value=2022, value=2010, step=1)
+#     st.write(threshold)
 
 
