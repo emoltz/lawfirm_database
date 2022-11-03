@@ -158,8 +158,9 @@ with features:
 with model_training:
 
     sel_col, disp_col = st.columns(2)
-    # sel_col.slider("What year are you searching?", min_value=2010,
-    #                max_value=2020, step= 1)
+    sel_col.slider("What year are you searching?", min_value=2010,
+                   max_value=2020)
+
 
     # dialogue box with a default value of 'lid', remove to set default to be empty
     input_feature = sel_col.text_input('Which feature should be used as input feature?', 'lid')
