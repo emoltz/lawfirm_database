@@ -29,6 +29,12 @@ def init_connection():
 conn = init_connection()
 
 
+def page_intro(page_name):
+    st.title(f"Welcome to the {page_name} Page")
+    st.text('Please use the left menu to navigate these pages')
+    st.write(":heavy_minus_sign:" * 35)
+
+
 @st.experimental_memo(ttl=600)
 def run_query(query):
     with conn.cursor() as cur:
@@ -43,13 +49,6 @@ with st.sidebar:
         default_index=0
     )
 
-
-def page_intro(selected):
-    st.title(f"Welcome to the {selected} Page")
-    st.text('Please use the left menu to navigate these pages')
-    st.write(":heavy_minus_sign:" * 35)
-
-
 if selected == "Home":
     with header:
         st.title("Welcome to Ethan & Julie Attorneys at Law")
@@ -62,7 +61,16 @@ if selected == "Clients":
     page_intro(selected)
 
 if selected == "Lawyers":
+    query = run_query("SELECT firstName, lastName from lawyers;")
+    to_string = len(query)
+    lawyer_list = []
+    for i in range(0, to_string):
+        lawyer_list.append(query[i][0] + query[i][1])
+
     page_intro(selected)
+    st.write("Lookup how many cases a lawyer has worked on:")
+    choice = st.selectbox("Select a Lawyer", lawyer_list, index=0)
+    st.metric("Cases Worked On", 42)
 
 if selected == "Cases":
     page_intro(selected)
