@@ -55,7 +55,7 @@ if selected == "Home":
         st.text('Please use the left menu to navigate these pages')
 
         # TODO make this work?
-        # input_feature = st.text_input('What would you like to search for?'"")
+        input_feature = st.text_input('What would you like to search for?'"")
 
 if selected == "Clients":
     page_intro(selected)
