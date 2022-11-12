@@ -61,16 +61,21 @@ if selected == "Clients":
     page_intro(selected)
 
 if selected == "Lawyers":
+    page_intro(selected)
+
     query = run_query("SELECT firstName, lastName from lawyers;")
-    to_string = len(query)
     lawyer_list = []
-    for i in range(0, to_string):
+    for i in range(0, len(query)):
         lawyer_list.append(query[i][0] + query[i][1])
 
-    page_intro(selected)
+
     st.write("Lookup how many cases a lawyer has worked on:")
     choice = st.selectbox("Select a Lawyer", lawyer_list, index=0)
-    st.metric("Cases Worked On", 42)
+    st.write("You selected:", choice)
+    cases_worked_on = run_query(
+        f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = 'Shawna';")
+
+    st.metric("Cases Worked On", cases_worked_on[0][0])
 
 if selected == "Cases":
     page_intro(selected)
