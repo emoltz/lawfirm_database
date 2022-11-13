@@ -1,6 +1,10 @@
 import psycopg2
 import streamlit as st
 import pandas as pd
+import wikipedia
+from typing import List
+
+from streamlit_searchbox import st_searchbox
 from classes import *
 import psycopg2
 from streamlit_option_menu import option_menu
@@ -56,7 +60,17 @@ if selected == "Home":
         st.text('Please use the left menu to navigate these pages')
 
         # TODO make this work?
-        input_feature = st.text_input('What would you like to search for?'"")
+        # input_feature = st.text_input('What would you like to search for?'"")
+
+
+        def search_wikipedia(searchterm) -> List[str]:
+            return wikipedia.search(searchterm) if searchterm else []
+
+        selected_value = st_searchbox(
+            search_wikipedia,
+            key="wiki_searchbox",
+        )
+        st.markdown("You selected: " + selected_value)
 
 if selected == "Clients":
     page_intro(selected)

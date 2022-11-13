@@ -48,6 +48,7 @@ SQLAlchemy==1.4.42
 streamlit==1.13.0
 streamlit-lottie==0.0.3
 streamlit-option-menu==0.3.2
+streamlit-searchbox==0.0.3
 toml==0.10.2
 tomli==2.0.1
 toolz==0.12.0
