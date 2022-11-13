@@ -64,22 +64,25 @@ if selected == "Clients":
 if selected == "Lawyers":
     page_intro(selected)
 
-    lawyer1 = Laywer("Ethan", "Hunt")
+    # lawyer1 = Laywer("Ethan", "Hunt")
     first_names = []
     last_names = []
 
+    # this gets the names from the lawyers table
     query = run_query("SELECT firstName, lastName from lawyers;")
     lawyer_list = []
+    # this puts them into three lists: one with the lawyers first and last names, and the other two with their first and last names isolated
     for i in range(0, len(query)):
         first_names.append(query[i][0])
         last_names.append(query[i][1])
         lawyer_list.append(query[i][0] + query[i][1])
 
     st.write("Lookup how many cases a lawyer has worked on:")
+    # feed the list of lawyers into the dropdown menu
     choice = st.selectbox("Select a Lawyer", lawyer_list, index=0)
     choice_index = None
 
-    # this is so we can isolate the first name of the lawyer. There's a better way to do this with string slicing but we can handle that later.
+    # this is so we can isolate the firs/last names of the lawyer. There's a better way to do this with string slicing but we can handle that later.
     for i in range(0, len(lawyer_list)):
         if choice == lawyer_list[i]:
             choice_index = i
@@ -89,7 +92,7 @@ if selected == "Lawyers":
         # TODO we should also have this grab last name
         f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = '{first_names[choice_index]}';")
 
-    # this query finds the total number of hours worked on by a lawyer
+    # this query finds the total number of hours worked on by a lawyer using their first and last names
     total_hours_query = f"""
         SELECT Sum(w.hours) as hours
         from lawyers l,
@@ -101,8 +104,10 @@ if selected == "Lawyers":
         and l.lastname = '{last_names[choice_index]}';
     """
 
+    # run the query and return data
     total_hours_worked = run_query(total_hours_query)
 
+    # put data into columns
     columns = st.columns(2)
     with columns[0]:
         st.metric("Cases Worked On", cases_worked_on[0][0])
