@@ -88,7 +88,6 @@ if selected == "Lawyers":
     cases_worked_on = run_query(
         f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = '{first_names[choice_index]}';")
 
-
     total_hours_query = f"""
         SELECT Sum(w.hours) as hours
         from lawyers l,
@@ -96,8 +95,8 @@ if selected == "Lawyers":
                works_on w
         where l.lid = w.lid
         and c.case_id = w.case_id
-        and l.firstName = 'Eric'
-        and l.lastname = 'Nelson';
+        and l.firstName = '{first_names[choice_index]}'
+        and l.lastname = '{last_names[choice_index]}';
     """
 
     total_hours_worked = run_query(total_hours_query)
