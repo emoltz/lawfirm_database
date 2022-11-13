@@ -86,8 +86,10 @@ if selected == "Lawyers":
 
     st.write("You selected:", choice)
     cases_worked_on = run_query(
+        # TODO we should also have this grab last name
         f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = '{first_names[choice_index]}';")
 
+    # this query finds the total number of hours worked on by a lawyer
     total_hours_query = f"""
         SELECT Sum(w.hours) as hours
         from lawyers l,
