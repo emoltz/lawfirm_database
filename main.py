@@ -127,16 +127,21 @@ if selected == "Cases":
     """
 
     verdict_query = f"""
-    SELECT	verdict
-    FROM		cases
-    WHERE 	case_id = {case_num}
+         SELECT	verdict
+         FROM		cases
+         WHERE 	case_id = {case_num}
     """
 
+    try:
+        verdict_of_case = run_query(verdict_query)
+        date_of_case = run_query(date_of_case_query)
+        st.write("Date of Case:", date_of_case[0][0])
+        st.write("Verdict: ", verdict_of_case[0][0].title())
+    except IndexError or ValueError:
+        st.markdown("## A case with that ID doesn't exist!")
 
-    date_of_case = run_query(date_of_case_query)
-    verdict_of_case = run_query(verdict_query)
-    st.write("Date of Case:", date_of_case[0][0])
-    st.write("Verdict: ", verdict_of_case[0][0])
+
+
 
 if selected == "Research":
     page_intro(selected)
