@@ -117,6 +117,27 @@ if selected == "Lawyers":
 if selected == "Cases":
     page_intro(selected)
 
+    case_num = st.number_input("Case ID", min_value=1, max_value=5)
+    st.write(case_num)
+    st.write("Lookup information about a case from the CaseID")
+    date_of_case_query = f"""
+            SELECT	date_closed
+            FROM cases
+            WHERE 	case_id = {case_num}	
+    """
+
+    verdict_query = f"""
+    SELECT	verdict
+    FROM		cases
+    WHERE 	case_id = {case_num}
+    """
+
+
+    date_of_case = run_query(date_of_case_query)
+    verdict_of_case = run_query(verdict_query)
+    st.write("Date of Case:", date_of_case[0][0])
+    st.write("Verdict: ", verdict_of_case[0][0])
+
 if selected == "Research":
     page_intro(selected)
 
