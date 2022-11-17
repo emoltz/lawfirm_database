@@ -105,7 +105,10 @@ if selected == "Lawyers":
     """
 
     # run the query and return data
-    total_hours_worked = run_query(total_hours_query)
+    try:
+        total_hours_worked = run_query(total_hours_query)
+    except IndexError:
+        st.write("Query did not work. ")
 
     # put data into columns
     columns = st.columns(2)
@@ -117,9 +120,8 @@ if selected == "Lawyers":
 if selected == "Cases":
     page_intro(selected)
 
+    st.markdown("### Lookup information about a case from the `CaseID`")
     case_num = st.number_input("Case ID", min_value=1, max_value=5)
-    st.write(case_num)
-    st.write("Lookup information about a case from the CaseID")
     date_of_case_query = f"""
             SELECT	date_closed
             FROM cases
@@ -131,12 +133,17 @@ if selected == "Cases":
          FROM		cases
          WHERE 	case_id = {case_num}
     """
-
+    tabs = st.tabs(["Date", "Verdict", "Topic", "Managed By", "Lawyers Involved"])
+    columns = st.columns(2)
     try:
         verdict_of_case = run_query(verdict_query)
         date_of_case = run_query(date_of_case_query)
-        st.write("Date of Case:", date_of_case[0][0])
-        st.write("Verdict: ", verdict_of_case[0][0].title())
+        with tabs[0]:
+            st.write(date_of_case[0][0])
+        with tabs[1]:
+            st.write(verdict_of_case[0][0].title())
+        with tabs[2]:
+            st.write("TODO")
     except IndexError or ValueError:
         st.markdown("## A case with that ID doesn't exist!")
 
