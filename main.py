@@ -1,4 +1,3 @@
-import psycopg2
 import streamlit as st
 import pandas as pd
 from classes import *
@@ -107,15 +106,14 @@ if selected == "Lawyers":
     # run the query and return data
     try:
         total_hours_worked = run_query(total_hours_query)
+        # put data into columns
+        columns = st.columns(2)
+        with columns[0]:
+            st.metric("Cases Worked On", cases_worked_on[0][0])
+        with columns[1]:
+            st.metric("Total hours worked on all cases", total_hours_worked[0][0])
     except IndexError:
         st.write("Query did not work. ")
-
-    # put data into columns
-    columns = st.columns(2)
-    with columns[0]:
-        st.metric("Cases Worked On", cases_worked_on[0][0])
-    with columns[1]:
-        st.metric("Total hours worked on all cases", total_hours_worked[0][0])
 
 if selected == "Cases":
     page_intro(selected)
@@ -146,9 +144,6 @@ if selected == "Cases":
             st.write("TODO")
     except IndexError or ValueError:
         st.markdown("## A case with that ID doesn't exist!")
-
-
-
 
 if selected == "Research":
     page_intro(selected)
