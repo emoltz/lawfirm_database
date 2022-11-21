@@ -31,7 +31,7 @@ conn = init_connection()
 
 def page_intro(page_name):
     st.title(f"Welcome to the {page_name} Page")
-    st.text('Please use the left menu to navigate these pages')
+    st.write('*Please use the left menu to navigate these pages*')
     st.markdown("---")
 
 
@@ -56,9 +56,6 @@ if selected == "Home":
 
         # TODO make this work?
         input_feature = st.text_input('What would you like to search for?'"")
-
-if selected == "Clients":
-    page_intro(selected)
 
 if selected == "Lawyers":
     page_intro(selected)
@@ -211,16 +208,48 @@ if selected == "Cases":
 
     hours_spent_on_topic_query = f"""
     SELECT	c.topic, sum(w.hours) as hours_spent
-FROM		cases c, works_on w
-WHERE 	c.case_id = w.case_id
-AND 		c.topic = '{selection}'
-GROUP BY	c.topic;"""
+    FROM		cases c, works_on w
+    WHERE 	c.case_id = w.case_id
+    AND 		c.topic = '{selection}'
+    GROUP BY	c.topic;"""
 
     try:
         hours_spent_on_topic = run_query(hours_spent_on_topic_query)
         st.metric("Hours Spent", hours_spent_on_topic[0][1])
     except IndexError or ValueError:
         st.markdown("**ERROR:** This topic hasn't been worked on yet!")
+
+if selected == "Clients":
+    page_intro(selected)
+
+    st.markdown("### What was the topic of the case that a client was involved in?")
+    client_list_query = """
+     SELECT distinct c.firstname, c.lastname from clients c;
+    """
+
+    client_list = run_query(client_list_query)
+    client_list_names = []
+    # combine first and last names
+    for name in client_list:
+        client_list_names.append(name[0] + " " + name[1])
+
+    selected_client = st.selectbox("Select a client", client_list_names)
+
+    # split the name into first and last
+    first_name = selected_client.split()[0]
+    last_name = selected_client.split()[1]
+
+    # query to get the case id
+    query = f"""
+    SELECT	c.topic
+    FROM		cases c, part_of p, clients cl
+    WHERE 	c.case_id = p.case_id
+    AND 		p.client_id = cl.cid
+    AND 		(cl.firstname = '{first_name}' AND cl.lastname = '{last_name}')
+"""
+    topics = run_query(query)
+    for topic in topics:
+        st.write(topic[0])
 
 if selected == "Research":
     page_intro(selected)
