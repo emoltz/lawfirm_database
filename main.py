@@ -81,7 +81,7 @@ if selected == "Lawyers":
     choice = st.selectbox("Select a Lawyer", lawyer_list, index=0)
     choice_index = None
 
-    # this is so we can isolate the firs/last names of the lawyer. There's a better way to do this with string slicing but we can handle that later.
+    # this is so we can isolate the first/last names of the lawyer. There's a better way to do this with string slicing but we can handle that later.
     for i in range(0, len(lawyer_list)):
         if choice == lawyer_list[i]:
             choice_index = i
@@ -169,7 +169,8 @@ if selected == "Cases":
 
     try:
         cases_closed_between_dates = run_query(cases_closed_between_dates_query)
-        cases_closed_between_dates_df = pd.DataFrame(cases_closed_between_dates, columns=["Case ID", "Topic", "Date Closed"])
+        cases_closed_between_dates_df = pd.DataFrame(cases_closed_between_dates,
+                                                     columns=["Case ID", "Topic", "Date Closed"])
         st.write(cases_closed_between_dates_df)
     except IndexError or ValueError:
         st.markdown("No cases were closed between those dates!")
@@ -190,9 +191,36 @@ if selected == "Cases":
 
     try:
         cases_over_amount = run_query(cases_over_amount_query)
-        st.metric("Cases: ",cases_over_amount[0][0])
+        st.metric("Cases: ", cases_over_amount[0][0])
     except IndexError or ValueError:
         st.markdown("No cases were closed between those dates!")
+
+    st.markdown("---")
+    st.markdown("### How many hours were spent on a particular topic?")
+    # topic_list = ["Divorce", "Criminal", "Bankruptcy", "Real Estate", "Tax"]
+    topic_list_query = """
+    SELECT distinct c.topic from cases c;
+    """
+
+    topic_list = run_query(topic_list_query)
+    # go through and clean the list
+    for topic in topic_list:
+        topic_list[topic_list.index(topic)] = topic[0]
+
+    selection = st.selectbox("Select a topic", topic_list)
+
+    hours_spent_on_topic_query = f"""
+    SELECT	c.topic, sum(w.hours) as hours_spent
+FROM		cases c, works_on w
+WHERE 	c.case_id = w.case_id
+AND 		c.topic = '{selection}'
+GROUP BY	c.topic;"""
+
+    try:
+        hours_spent_on_topic = run_query(hours_spent_on_topic_query)
+        st.metric("Hours Spent", hours_spent_on_topic[0][1])
+    except IndexError or ValueError:
+        st.markdown("**ERROR:** This topic hasn't been worked on yet!")
 
 if selected == "Research":
     page_intro(selected)
