@@ -32,7 +32,7 @@ conn = init_connection()
 def page_intro(page_name):
     st.title(f"Welcome to the {page_name} Page")
     st.text('Please use the left menu to navigate these pages')
-    st.write(":heavy_minus_sign:" * 35)
+    st.markdown("---")
 
 
 @st.experimental_memo(ttl=600)
@@ -131,6 +131,7 @@ if selected == "Cases":
          FROM		cases
          WHERE 	case_id = {case_num}
     """
+
     tabs = st.tabs(["Date", "Verdict", "Topic", "Managed By", "Lawyers Involved"])
     columns = st.columns(2)
     try:
@@ -142,8 +143,38 @@ if selected == "Cases":
             st.write(verdict_of_case[0][0].title())
         with tabs[2]:
             st.write("TODO")
+        with tabs[3]:
+            st.write("TODO")
+        with tabs[4]:
+            st.write("TODO")
     except IndexError or ValueError:
         st.markdown("## A case with that ID doesn't exist!")
+
+    st.markdown("---")
+    st.markdown("### What cases were closed between two dates?")
+    columns = st.columns(2)
+    with columns[0]:
+        start_date = st.date_input("Start Date")
+        start_date_string = str(start_date.strftime("%Y-%m-%d"))
+    with columns[1]:
+        end_date = st.date_input("End Date")
+        end_date_string = str(end_date.strftime("%Y-%m-%d"))
+
+    test1 = '2012-01-01'
+    test2 = '2013-01-02'
+    st.write(test1)
+
+    cases_closed_between_dates_query = f"""
+    SELECT case_id, topic
+    FROM cases
+    WHERE date_closed BETWEEN '{test1}' AND '{test2}';
+    """
+
+    try:
+        cases_closed_between_dates = run_query(cases_closed_between_dates_query)
+        st.write(cases_closed_between_dates)
+    except IndexError or ValueError:
+        st.markdown("Error: No cases closed between those dates")
 
 if selected == "Research":
     page_intro(selected)
