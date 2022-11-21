@@ -160,21 +160,19 @@ if selected == "Cases":
         end_date = st.date_input("End Date")
         end_date_string = str(end_date.strftime("%Y-%m-%d"))
 
-    test1 = '2012-01-01'
-    test2 = '2013-01-02'
-    st.write(test1)
-
     cases_closed_between_dates_query = f"""
-    SELECT case_id, topic
-    FROM cases
-    WHERE date_closed BETWEEN '{test1}' AND '{test2}';
+         SELECT distinct c.case_id, c.topic, c.date_closed
+         FROM cases c
+         WHERE date_closed BETWEEN '{start_date_string}' AND '{end_date_string}'
+         order by c.date_closed;
     """
 
     try:
         cases_closed_between_dates = run_query(cases_closed_between_dates_query)
-        st.write(cases_closed_between_dates)
+        cases_closed_between_dates_df = pd.DataFrame(cases_closed_between_dates, columns=["Case ID", "Topic", "Date Closed"])
+        st.write(cases_closed_between_dates_df)
     except IndexError or ValueError:
-        st.markdown("Error: No cases closed between those dates")
+        st.markdown("No cases were closed between those dates!")
 
 if selected == "Research":
     page_intro(selected)
