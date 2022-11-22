@@ -248,8 +248,9 @@ if selected == "Clients":
     AND 		(cl.firstname = '{first_name}' AND cl.lastname = '{last_name}')
 """
     topics = run_query(query)
-    for topic in topics:
-        st.write(topic[0])
+
+    for i, topic in enumerate(topics):
+        st.write(topic[i])
 
 if selected == "Research":
     page_intro(selected)
