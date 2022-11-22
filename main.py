@@ -246,7 +246,7 @@ if selected == "Clients":
     WHERE 	c.case_id = p.case_id
     AND 		p.client_id = cl.cid
     AND 		(cl.firstname = '{first_name}' AND cl.lastname = '{last_name}')
-"""
+    """
     topics = run_query(query)
 
     for i, topic in enumerate(topics):
