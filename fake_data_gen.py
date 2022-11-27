@@ -1,6 +1,7 @@
 from faker import Faker
 import streamlit as st
 import psycopg2
+from faker.providers import DynamicProvider
 
 
 # CLASSES:
@@ -57,6 +58,44 @@ class FakeClient:
         self.lastname = fake.last_name()
         self.email = fake.email()
         self.phone = fake.random_int(min=1111111, max=9999999)
+
+
+class FakeContacts:
+    cid = 0  # client ID -- foreign key
+    id = 0
+    firstname = ""
+    lastname = ""
+    phone = ""
+    email = ""
+    type_of_relation = ""
+    relationship_provider = DynamicProvider(
+        provider_name="relationship_provider",
+        elements=["mother", "father", "son", "daughter", "cousin", "friend", "neighbor"],
+    )
+    client_ids = []
+
+    def get_client_ids(self):
+        conn = psycopg2.connect(**st.secrets["postgres"])
+        cur = conn.cursor()
+
+        cur.execute(f"SELECT cid from clients;")
+        self.client_ids = cur.fetchall()
+
+    def __init__(self):
+        fake = Faker()
+        fake.add_provider(self.relationship_provider)
+        self.get_client_ids()
+
+        self.cid = fake.random_element(self.client_ids)[0]
+        self.id = fake.unique.random_int(min=0, max=10000)
+        self.firstname = fake.first_name()
+        self.lastname = fake.last_name()
+        self.phone = fake.unique.random_int(min=1111111, max=9999999)
+        self.email = fake.email()
+        self.type_of_relation = fake.relationship_provider()
+
+    def __str__(self):
+        return f"{self.cid}, {self.firstname} {self.lastname} {self.phone} {self.email} {self.type_of_relation}"
 
 
 class FakeParalegal:
@@ -144,8 +183,20 @@ def populate_laywer_table():
         conn.commit()
 
 
+def populate_contacts_table(amount=25):
+    contacts_list = []
+    for _ in range(amount):
+        contacts_list.append(FakeContacts())
+    for contact in contacts_list:
+        cur.execute(
+            f"INSERT INTO contacts_related_to (cid, id, firstname, lastname, phone, email, type_of_relation) VALUES ('{contact.cid}', '{contact.id}', '{contact.firstname}', '{contact.lastname}', '{contact.phone}','{contact.email}','{contact.type_of_relation}')"
+        )
+        conn.commit()
+
+
 # SCRIPTS:
 populate_laywer_table()
 populate_client_table()
 populate_paralegal_table()
 populate_judge_table()
+populate_contacts_table()

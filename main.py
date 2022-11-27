@@ -233,7 +233,7 @@ if selected == "Clients":
     for name in client_list:
         client_list_names.append(name[0] + " " + name[1])
 
-    selected_client = st.selectbox("Select a client", client_list_names)
+    selected_client = st.selectbox("Select a client", client_list_names, key="client01")
 
     # split the name into first and last
     first_name = selected_client.split()[0]
@@ -251,6 +251,18 @@ if selected == "Clients":
 
     for i, topic in enumerate(topics):
         st.write(topic[i])
+
+    st.markdown("---")
+    st.markdown("### What is the phone number of a client's contact?")
+
+    # Select client, then select contact
+
+    selected_client = st.selectbox("Select a client", client_list_names, key="client02")
+
+    # list of contacts
+
+
+    selected_contact = st.selectbox("Select a contact", ["TODO", "TODO", "TODO"], key="contacts")
 
 if selected == "Research":
     page_intro(selected)
