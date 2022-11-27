@@ -128,7 +128,7 @@ if selected == "Cases":
          FROM		cases
          WHERE 	case_id = {case_num}
     """
-
+    # TODO get rid of tabs (don't work on jedi)
     tabs = st.tabs(["Date", "Verdict", "Topic", "Managed By", "Lawyers Involved"])
     columns = st.columns(2)
     try:
