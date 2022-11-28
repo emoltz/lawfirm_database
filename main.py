@@ -297,13 +297,14 @@ if selected == "Clients":
         st.markdown("**Contacts:**")
     # st.write(contacts_list)
 
-    for contact in contacts_list:
-        st.write("**Name:**", contact[0], contact[1])
-        st.write("**Phone Number:**", contact[2])
-        st.write("**Email:**", contact[3])
-
-    # st.write(contacts_list)
-    # selected_contact = st.selectbox("Select a contact (if applicable)", contacts_list, key="contacts")
+    num_of_columns = len(contacts_list)
+    columns = st.columns(num_of_columns)
+    for i, contact in enumerate(contacts_list):
+        with columns[i]:
+            st.write("**Name:**", contact[0], contact[1])
+            st.write("**Phone Number:**", contact[2])
+            st.write("**Email:**", contact[3])
+            st.markdown("---")
 
 if selected == "Research":
     page_intro(selected)
