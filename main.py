@@ -1,6 +1,8 @@
+import requests
 import streamlit as st
 import pandas as pd
 from classes import *
+from streamlit_lottie import st_lottie
 import psycopg2
 from streamlit_option_menu import option_menu
 
@@ -25,6 +27,12 @@ dataset = st.container()
 def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
 
+
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
 
 def get_first_last_names_from_query(query):
     list = run_query(query)
@@ -73,8 +81,9 @@ if selected == "Home":
         st.title("Welcome to Ethan & Julie Attorneys at Law")
         st.text('Please use the left menu to navigate these pages')
 
-        # TODO make this work?
-        input_feature = st.text_input('What would you like to search for?'"")
+    lottie_url = "https://assets4.lottiefiles.com/packages/lf20_bmqwuqs8.json"
+    lottie_json = load_lottieurl(lottie_url)
+    st_lottie(lottie_json, speed=1, height=300, key="initial")
 
 if selected == "Lawyers":
     page_intro(selected)
@@ -297,13 +306,16 @@ if selected == "Clients":
         st.markdown("**Contacts:**")
     # st.write(contacts_list)
 
-    num_of_columns = len(contacts_list)
-    columns = st.columns(num_of_columns)
+    try:
+        num_of_columns = len(contacts_list)
+        columns = st.columns(num_of_columns)
+    except:
+        pass
     for i, contact in enumerate(contacts_list):
         with columns[i]:
             st.write("**Name:**", contact[0], contact[1])
-            st.write("**Phone Number:**", contact[2])
-            st.write("**Email:**", contact[3])
+            st.write("**Phone:**", contact[2])
+            st.write(contact[3])
             st.markdown("---")
 
 if selected == "Research":
