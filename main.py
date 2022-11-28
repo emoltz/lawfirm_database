@@ -289,9 +289,10 @@ if selected == "Clients":
     select firstname, lastname, phone, email from contacts_related_to where cid = {client_id};"""
     #
     contacts_list = run_query(contacts_query)
-
-
-    st.markdown("**Contacts:**")
+    if contacts_list == []:
+        st.markdown("No contacts for this client!")
+    else:
+        st.markdown("**Contacts:**")
     # st.write(contacts_list)
 
     for contact in contacts_list:
