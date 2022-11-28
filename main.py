@@ -36,12 +36,14 @@ def get_first_last_names_from_query(query):
     return list_names
 
 
-def get_info_from_query(query, id:bool = False, name:bool = False, phone:bool = False, email:bool = False, relation:bool = False):
+def get_info_from_query(query, id: bool = False, name: bool = False, phone: bool = False, email: bool = False,
+                        relation: bool = False):
     list = run_query(query)
     result_list = []
 
     for item in list:
         result_list
+
 
 conn = init_connection()
 
@@ -289,7 +291,7 @@ if selected == "Clients":
     select firstname, lastname, phone, email from contacts_related_to where cid = {client_id};"""
     #
     contacts_list = run_query(contacts_query)
-    if contacts_list == []:
+    if not contacts_list:
         st.markdown("No contacts for this client!")
     else:
         st.markdown("**Contacts:**")
