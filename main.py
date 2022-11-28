@@ -26,6 +26,23 @@ def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
 
 
+def get_first_last_names_from_query(query):
+    list = run_query(query)
+    list_names = []
+    # combine first and last names
+    for name in list:
+        list_names.append(name[0] + " " + name[1])
+
+    return list_names
+
+
+def get_info_from_query(query, id:bool = False, name:bool = False, phone:bool = False, email:bool = False, relation:bool = False):
+    list = run_query(query)
+    result_list = []
+
+    for item in list:
+        result_list
+
 conn = init_connection()
 
 
@@ -241,12 +258,12 @@ if selected == "Clients":
 
     # query to get the case id
     query = f"""
-    SELECT	c.topic
-    FROM		cases c, part_of p, clients cl
-    WHERE 	c.case_id = p.case_id
-    AND 		p.client_id = cl.cid
-    AND 		(cl.firstname = '{first_name}' AND cl.lastname = '{last_name}')
-    """
+        SELECT	c.topic
+        FROM		cases c, part_of p, clients cl
+        WHERE 	c.case_id = p.case_id
+        AND 		p.client_id = cl.cid
+        AND 		(cl.firstname = '{first_name}' AND cl.lastname = '{last_name}')
+        """
     topics = run_query(query)
 
     for i, topic in enumerate(topics):
@@ -254,15 +271,36 @@ if selected == "Clients":
 
     st.markdown("---")
     st.markdown("### What is the phone number of a client's contact?")
-
-    # Select client, then select contact
-
     selected_client = st.selectbox("Select a client", client_list_names, key="client02")
 
-    # list of contacts
+    # get id from selected client
+    selected_client_firstName = selected_client.split()[0]
+    selected_client_lastName = selected_client.split()[1]
+
+    # get the id of the client
+    client_id_query = f"""
+    SELECT cid from clients where firstname = '{selected_client_firstName}' and lastname = '{selected_client_lastName}';
+    """
+
+    client_id = run_query(client_id_query)
+    client_id = client_id[0][0]
+
+    contacts_query = f"""
+    select firstname, lastname, phone, email from contacts_related_to where cid = {client_id};"""
+    #
+    contacts_list = run_query(contacts_query)
 
 
-    selected_contact = st.selectbox("Select a contact", ["TODO", "TODO", "TODO"], key="contacts")
+    st.markdown("**Contacts:**")
+    # st.write(contacts_list)
+
+    for contact in contacts_list:
+        st.write("**Name:**", contact[0], contact[1])
+        st.write("**Phone Number:**", contact[2])
+        st.write("**Email:**", contact[3])
+
+    # st.write(contacts_list)
+    # selected_contact = st.selectbox("Select a contact (if applicable)", contacts_list, key="contacts")
 
 if selected == "Research":
     page_intro(selected)
