@@ -247,6 +247,7 @@ if selected == "Cases":
         st.metric("Hours Spent", hours_spent_on_topic[0][1])
     except IndexError or ValueError:
         st.markdown("**ERROR:** This topic hasn't been worked on yet!")
+
 # --------------------------------- Clients page --------------------------------------
 if selected == "Clients":
     page_intro(selected)
@@ -318,6 +319,7 @@ if selected == "Clients":
             st.write("**Phone:**", contact[2])
             st.write(contact[3])
             st.markdown("---")
+# --------------------------------- Research page ------------------------------------
 
 if selected == "Research":
     page_intro(selected)
@@ -341,7 +343,27 @@ if selected == "Courts":
         st.write("This case was tried in: ", court_output, "court")
     except IndexError or ValueError:
         st.write("**ERROR:** Case number: ", case_num, " was not tried in any court.")
+
     st.markdown("---")
+
+    judge_query = f"""
+                SELECT	j.firstname, j.lastname, c.topic, j.court
+                FROM judges j, cases c
+                WHERE j.judgeid = c.presided_by
+                AND c.case_id = {case_num}	
+        """
+    #TODO fix judge first and last name display and include error handling
+    judges_list = run_query(judge_query)
+    judges_list_names = []
+    # combine first and last names of judge
+    for name in judges_list:
+        judges_list_names.append(name[0] + " " + name[1])
+
+    judge_name = judges_list_names
+
+    st.write("### The presiding judge for case number ", case_num, " is honorable", judge_name)
+
+
 
 
 
