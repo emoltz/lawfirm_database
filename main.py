@@ -341,6 +341,7 @@ if selected == "Courts":
         court_output = run_query(court_query)
         court_output = court_output[0][0]
         st.write("This case was tried in: ", court_output, "court")
+
     except IndexError or ValueError:
         st.write("**ERROR:** Case number: ", case_num, " was not tried in any court.")
 
@@ -352,7 +353,7 @@ if selected == "Courts":
                 WHERE j.judgeid = c.presided_by
                 AND c.case_id = {case_num}	
         """
-    #TODO fix judge first and last name display and include error handling
+    #TODO include error handling
     judges_list = run_query(judge_query)
     judges_list_names = []
     # combine first and last names of judge
@@ -360,8 +361,7 @@ if selected == "Courts":
         judges_list_names.append(name[0] + " " + name[1])
 
     judge_name = judges_list_names
-
-    st.write("### The presiding judge for case number ", case_num, " is honorable", judge_name)
+    st.write("### The presiding judge for case number ", case_num, " was the honorable", judge_name[0])
 
 
 
