@@ -75,7 +75,7 @@ if selected == "Home":
         check_box_input = st.checkbox("Was this case closed?")
         st.write(check_box_input)
 
-        selected_element = st.selectbox("Pick an item", ("item1", "item2", "item3"))
+        selected_element = st.selectbox("Pick an item from this drop-down menu", ("item1", "item2", "item3"))
         st.write(selected_element)
 
 # ------------------------------------------- Lawyers -------------------------------------------
@@ -83,6 +83,7 @@ if selected == "Lawyers":
     #st.title(f"You have selected {selected}")
     with header:
         st.header("Lawyers")
+        # divider linw
         st.write(":heavy_minus_sign:" * 35)
         lefthand_col, somethingelse_col = st.columns(2)
         # Drop-down menu example
@@ -98,7 +99,7 @@ if selected == "Cases":
         st.header("Cases")
         # divider line
         st.write(":heavy_minus_sign:" * 35)
-        # another divider line
+        # another type of divider line
         st.markdown("""<hr style="height:5px;border:none;color:#222;background-color:#333;" /> """,
                     unsafe_allow_html=True)
         col1, col2 = st.columns(2)
@@ -113,7 +114,7 @@ if selected == "Cases":
             else:
                 st.write("You didn't select real estate.")
 
-        # Another way to incorporate a slider (in right-hand column)
+        # Another way to incorporate a slider (in right-hand column, col2)
         with col2:
             threshold = st.slider("What year was the case closed?", min_value=2010, max_value=2022, value=2010, step=1)
             st.write(threshold)
@@ -139,8 +140,7 @@ if selected == "Research":
         # dialogue box with a default value of 'lid', remove to set default to be empty
         input_feature = st.text_input('Type in what research document you want:', 'Contract 152', key =0)
 
-
-
+# ---------------------- Other features --------------------------------------------------------------------
 with dataset:
     # dataset section
     st.header("Fake Lawyer Dataset")

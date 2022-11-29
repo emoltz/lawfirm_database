@@ -72,7 +72,7 @@ def run_query(query):
 with st.sidebar:
     selected = option_menu(
         menu_title="Menu",  # required
-        options=["Home", "Lawyers", "Cases", "Clients", "Research", "etc"],  # required
+        options=["Home", "Lawyers", "Cases", "Clients", "Research", "Courts"],  # required
         default_index=0
     )
 
@@ -140,10 +140,11 @@ if selected == "Lawyers":
     except IndexError:
         st.write("Query did not work. ")
 
+# --------------------------------- Cases page --------------------------------------
 if selected == "Cases":
     page_intro(selected)
 
-    st.markdown("### Lookup information about a case from the `CaseID`")
+    st.markdown("### Look up information about a case from the `CaseID`")
     case_num = st.number_input("Case ID", min_value=1, max_value=5)
     date_of_case_query = f"""
             SELECT	date_closed
@@ -246,7 +247,7 @@ if selected == "Cases":
         st.metric("Hours Spent", hours_spent_on_topic[0][1])
     except IndexError or ValueError:
         st.markdown("**ERROR:** This topic hasn't been worked on yet!")
-
+# --------------------------------- Clients page --------------------------------------
 if selected == "Clients":
     page_intro(selected)
 
@@ -321,5 +322,26 @@ if selected == "Clients":
 if selected == "Research":
     page_intro(selected)
 
-if selected == "etc":
+# --------------------------------- Courts page --------------------------------------
+if selected == "Courts":
     page_intro(selected)
+
+    st.markdown("### Look up courts based on `CaseID`")
+    case_num = st.number_input("Case ID", min_value=1, max_value=5)
+    court_query = f"""
+                SELECT	j.court
+                FROM judges j, cases c
+                WHERE j.judgeid = c.presided_by
+                AND c.case_id = {case_num}	
+        """
+
+    try:
+        court_output = run_query(court_query)
+        court_output = court_output[0][0]
+        st.write("This case was tried in: ", court_output, "court")
+    except IndexError or ValueError:
+        st.write("**ERROR:** Case number: ", case_num, " was not tried in any court.")
+    st.markdown("---")
+
+
+
