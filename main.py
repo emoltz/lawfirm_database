@@ -72,10 +72,10 @@ def run_query(query):
 with st.sidebar:
     selected = option_menu(
         menu_title="Menu",  # required
-        options=["Home", "Lawyers", "Cases", "Clients", "Research", "etc"],  # required
+        options=["Home", "Lawyers", "Cases", "Clients", "Research", "Courts"],  # required
         default_index=0
     )
-
+# --------------------------------- Home page --------------------------------------
 if selected == "Home":
     with header:
         st.title("Welcome to Ethan & Julie Attorneys at Law")
@@ -85,6 +85,7 @@ if selected == "Home":
     lottie_json = load_lottieurl(lottie_url)
     st_lottie(lottie_json, speed=1, height=300, key="initial")
 
+# --------------------------------- Lawyers page --------------------------------------
 if selected == "Lawyers":
     page_intro(selected)
 
@@ -140,10 +141,11 @@ if selected == "Lawyers":
     except IndexError:
         st.write("Query did not work. ")
 
+# --------------------------------- Cases page --------------------------------------
 if selected == "Cases":
     page_intro(selected)
 
-    st.markdown("### Lookup information about a case from the `CaseID`")
+    st.markdown("### Look up information about a case from the `CaseID`")
     case_num = st.number_input("Case ID", min_value=1, max_value=5)
     date_of_case_query = f"""
             SELECT	date_closed
@@ -247,6 +249,7 @@ if selected == "Cases":
     except IndexError or ValueError:
         st.markdown("**ERROR:** This topic hasn't been worked on yet!")
 
+# --------------------------------- Clients page --------------------------------------
 if selected == "Clients":
     page_intro(selected)
 
@@ -317,9 +320,52 @@ if selected == "Clients":
             st.write("**Phone:**", contact[2])
             st.write(contact[3])
             st.markdown("---")
+# --------------------------------- Research page ------------------------------------
 
 if selected == "Research":
     page_intro(selected)
 
-if selected == "etc":
+# --------------------------------- Courts page --------------------------------------
+if selected == "Courts":
     page_intro(selected)
+
+    st.markdown("### Look up courts based on `CaseID`")
+    case_num = st.number_input("Case ID", min_value=1, max_value=5)
+    court_query = f"""
+                SELECT	j.court
+                FROM judges j, cases c
+                WHERE j.judgeid = c.presided_by
+                AND c.case_id = {case_num}	
+        """
+
+    try:
+        court_output = run_query(court_query)
+        court_output = court_output[0][0]
+        st.write("### This case was tried in: ", court_output, "court")
+
+        judge_query = f"""
+                        SELECT	j.firstname, j.lastname, c.topic, j.court
+                        FROM judges j, cases c
+                        WHERE j.judgeid = c.presided_by
+                        AND c.case_id = {case_num}	
+                """
+        judges_list = run_query(judge_query)
+        judges_list_names = []
+        # combine first and last names of judge
+        for name in judges_list:
+            judges_list_names.append(name[0] + " " + name[1])
+
+        judge_name = judges_list_names
+        st.write("### The presiding judge for case number ", case_num, " was the honorable", judge_name[0])
+
+    except IndexError or ValueError:
+        st.write("### **ERROR:** Case number: ", case_num, " was not tried in any court.")
+
+    st.markdown("---")
+
+
+
+
+
+
+
