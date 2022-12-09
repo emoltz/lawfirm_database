@@ -67,7 +67,7 @@ def run_query(query):
 with st.sidebar:
     selected = option_menu(
         menu_title="Menu",  # required
-        options=["Home", "Lawyers", "Cases", "Clients", "Research", "Courts"],  # required
+        options=["Home", "Lawyers", "Cases", "Clients", "Courts"],  # required
         default_index=0
     )
 # --------------------------------- Home page --------------------------------------
@@ -75,6 +75,7 @@ if selected == "Home":
     with header:
         st.title("Moltz & Goldbas Attorneys at Law")
         st.markdown("*Please use the left menu to navigate these pages*")
+    st.balloons()
 
     lottie_url = "https://assets4.lottiefiles.com/packages/lf20_bmqwuqs8.json"
     lottie_json = load_lottieurl(lottie_url)
@@ -339,15 +340,13 @@ if selected == "Clients":
     with columns[0]:
         st.metric("Outstanding Balances", client_outstanding_balance[0][0], delta=client_delta)
     with columns[1]:
-        st.metric("Fully Paid Clients", total_clients[0][0] - client_outstanding_balance[0][0], delta=-1*client_delta)
+        st.metric("Fully Paid Clients", total_clients[0][0] - client_outstanding_balance[0][0], delta=-1 * client_delta)
     st.bar_chart(data=[client_outstanding_balance[0][0], total_clients[0][0] - client_outstanding_balance[0][0]])
-
-
 
 # --------------------------------- Research page ------------------------------------
 
-if selected == "Research":
-    page_intro(selected)
+# if selected == "Research":
+#     page_intro(selected)
 
 # --------------------------------- Courts page --------------------------------------
 if selected == "Courts":
@@ -365,7 +364,7 @@ if selected == "Courts":
     try:
         court_output = run_query(court_query)
         court_output = court_output[0][0]
-        st.write("### This case was tried in: ", court_output, "court")
+        st.write("This case was tried in: ", court_output, "court")
 
         judge_query = f"""
                         SELECT	j.firstname, j.lastname, c.topic, j.court
@@ -380,9 +379,56 @@ if selected == "Courts":
             judges_list_names.append(name[0] + " " + name[1])
 
         judge_name = judges_list_names
-        st.write("### The presiding judge for case number ", case_num, " was the honorable", judge_name[0])
+        st.write("The presiding judge for case number ", case_num, " was the honorable", judge_name[0], ".")
 
     except IndexError or ValueError:
-        st.write("### **ERROR:** Case number: ", case_num, " was not tried in any court.")
+        st.write("### Case number: ", case_num, " was not tried in any court.")
 
     horizontal_line()
+
+
+    # how many cases has [judge] presided over that dealth with [topic]?
+    st.markdown("### How many cases has a judge presided over that dealt with a specific topic?")
+    judge_list_query = """
+        SELECT distinct j.firstname, j.lastname from judges j;
+    """
+    judge_list_names = []
+    judge_list = run_query(judge_list_query)
+    # combine first and last names
+    for name in judge_list:
+        judge_list_names.append(name[0] + " " + name[1])
+
+    case_topics_query = f"""
+        SELECT distinct c.topic from cases c;
+    """
+    case_topics = run_query(case_topics_query)
+    case_topics_list = []
+    for topic in case_topics:
+        case_topics_list.append(topic[0])
+    columns = st.columns(2)
+    with columns[0]:
+        selected_judge = st.selectbox("Select a judge", judge_list_names, key="judge01")
+    with columns[1]:
+        selected_topic = st.selectbox("Select a topic", case_topics_list, key="topic01")
+
+    selected_judge_firstName = selected_judge.split()[0]
+    selected_judge_lastName = selected_judge.split()[1]
+
+    try:
+
+        number_of_times_query = f"""
+        SELECT count(c.topic)
+        FROM judges j,
+             cases c
+        WHERE j.judgeid = c.presided_by
+          and j.firstname = '{selected_judge_firstName}'
+          and j.lastname = '{selected_judge_lastName}'
+          and c.topic = '{selected_topic}'
+        group by j.firstname, j.lastname
+        """
+
+        number_of_times = run_query(number_of_times_query)
+
+        st.metric(f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:", number_of_times[0][0])
+    except IndexError or ValueError:
+        st.error("No cases were found for this judge and topic combination.")
