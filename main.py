@@ -65,13 +65,13 @@ def run_query(query):
 
 
 with st.sidebar:
-    selected = option_menu(
+    sidebar_selection = option_menu(
         menu_title="Menu",  # required
         options=["Home", "Lawyers", "Cases", "Clients", "Courts"],  # required
         default_index=0
     )
 # --------------------------------- Home page --------------------------------------
-if selected == "Home":
+if sidebar_selection == "Home":
     with header:
         st.title("Moltz & Goldbas Attorneys at Law")
         st.markdown("*Please use the left menu to navigate these pages*")
@@ -82,8 +82,8 @@ if selected == "Home":
     st_lottie(lottie_json, speed=1, height=300, key="initial")
 
 # --------------------------------- Lawyers page --------------------------------------
-if selected == "Lawyers":
-    page_intro(selected)
+if sidebar_selection == "Lawyers":
+    page_intro(sidebar_selection)
 
     # lawyer1 = Laywer("Ethan", "Hunt")
     first_names = []
@@ -138,8 +138,8 @@ if selected == "Lawyers":
         st.write("Query did not work. ")
 
 # --------------------------------- Cases page --------------------------------------
-if selected == "Cases":
-    page_intro(selected)
+if sidebar_selection == "Cases":
+    page_intro(sidebar_selection)
 
     st.markdown("### Look up information about a case from the `CaseID`")
     case_num = st.number_input("Case ID", min_value=1, max_value=5)
@@ -246,8 +246,8 @@ if selected == "Cases":
         st.markdown("**ERROR:** This topic hasn't been worked on yet!")
 
 # --------------------------------- Clients page --------------------------------------
-if selected == "Clients":
-    page_intro(selected)
+if sidebar_selection == "Clients":
+    page_intro(sidebar_selection)
 
     st.markdown("### What was the topic of the case that a client was involved in?")
     client_list_query = """
@@ -349,8 +349,8 @@ if selected == "Clients":
 #     page_intro(selected)
 
 # --------------------------------- Courts page --------------------------------------
-if selected == "Courts":
-    page_intro(selected)
+if sidebar_selection == "Courts":
+    page_intro(sidebar_selection)
 
     st.markdown("### Look up courts based on `CaseID`")
     case_num = st.number_input("Case ID", min_value=1, max_value=5)
@@ -385,7 +385,6 @@ if selected == "Courts":
         st.write("### Case number: ", case_num, " was not tried in any court.")
 
     horizontal_line()
-
 
     # how many cases has [judge] presided over that dealth with [topic]?
     st.markdown("### How many cases has a judge presided over that dealt with a specific topic?")
@@ -429,6 +428,7 @@ if selected == "Courts":
 
         number_of_times = run_query(number_of_times_query)
 
-        st.metric(f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:", number_of_times[0][0])
+        st.metric(f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:",
+                  number_of_times[0][0])
     except IndexError or ValueError:
-        st.error("No cases were found for this judge and topic combination.")
+        st.metric(f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:", 0)
