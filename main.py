@@ -316,8 +316,32 @@ if selected == "Clients":
             st.write(contact[3])
             horizontal_line()
 
-    # TODO outstanding balances
     horizontal_line()
+    st.markdown("### How many clients have outstanding balances?")
+
+    client_outstanding_balance_query = f"""
+        select count(*)
+        from cases c, clients cl, part_of p
+        where c.case_id = p.case_id
+        and cl.cid = p.client_id
+        and c.paid = false
+    """
+
+    number_of_clients_query = f"""
+        select count(*)
+        from clients;
+    """
+
+    total_clients = run_query(number_of_clients_query)
+    client_outstanding_balance = run_query(client_outstanding_balance_query)
+    columns = st.columns(2)
+    client_delta = -1
+    with columns[0]:
+        st.metric("Outstanding Balances", client_outstanding_balance[0][0], delta=client_delta)
+    with columns[1]:
+        st.metric("Fully Paid Clients", total_clients[0][0] - client_outstanding_balance[0][0], delta=-1*client_delta)
+    st.bar_chart(data=[client_outstanding_balance[0][0], total_clients[0][0] - client_outstanding_balance[0][0]])
+
 
 
 # --------------------------------- Research page ------------------------------------

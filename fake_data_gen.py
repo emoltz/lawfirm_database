@@ -194,9 +194,11 @@ def populate_contacts_table(amount=25):
         conn.commit()
 
 
-# SCRIPTS:
+# ----------- SCRIPTS: Uncomment to run-----
+
 # populate_laywer_table()
 # populate_client_table()
 # populate_paralegal_table()
 # populate_judge_table()
 populate_contacts_table(100)
+
