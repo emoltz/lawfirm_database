@@ -1,7 +1,6 @@
 import requests
 import streamlit as st
 import pandas as pd
-from classes import *
 from streamlit_lottie import st_lottie
 import psycopg2
 from streamlit_option_menu import option_menu
@@ -34,6 +33,7 @@ def load_lottieurl(url: str):
         return None
     return r.json()
 
+
 def get_first_last_names_from_query(query):
     list = run_query(query)
     list_names = []
@@ -44,21 +44,16 @@ def get_first_last_names_from_query(query):
     return list_names
 
 
-def get_info_from_query(query, id: bool = False, name: bool = False, phone: bool = False, email: bool = False,
-                        relation: bool = False):
-    list = run_query(query)
-    result_list = []
-
-    for item in list:
-        result_list
-
-
 conn = init_connection()
 
 
 def page_intro(page_name):
     st.title(f"Welcome to the {page_name} Page")
     st.write('*Please use the left menu to navigate these pages*')
+    st.markdown("---")
+
+
+def horizontal_line():
     st.markdown("---")
 
 
@@ -78,8 +73,8 @@ with st.sidebar:
 # --------------------------------- Home page --------------------------------------
 if selected == "Home":
     with header:
-        st.title("Welcome to Ethan & Julie Attorneys at Law")
-        st.text('Please use the left menu to navigate these pages')
+        st.title("Moltz & Goldbas Attorneys at Law")
+        st.markdown("*Please use the left menu to navigate these pages*")
 
     lottie_url = "https://assets4.lottiefiles.com/packages/lf20_bmqwuqs8.json"
     lottie_json = load_lottieurl(lottie_url)
@@ -177,7 +172,7 @@ if selected == "Cases":
     except IndexError or ValueError:
         st.markdown("## A case with that ID doesn't exist!")
 
-    st.markdown("---")
+    horizontal_line()
     st.markdown("### What cases were closed between two dates?")
     columns = st.columns(2)
     with columns[0]:
@@ -202,7 +197,7 @@ if selected == "Cases":
     except IndexError or ValueError:
         st.markdown("No cases were closed between those dates!")
 
-    st.markdown("---")
+    horizontal_line()
     st.markdown("### How many cases were there that made over the selected amount of money?")
     number_input = st.number_input("Amount of money", value=1.00, step=0.50)
 
@@ -222,7 +217,7 @@ if selected == "Cases":
     except IndexError or ValueError:
         st.markdown("No cases were closed between those dates!")
 
-    st.markdown("---")
+    horizontal_line()
     st.markdown("### How many hours were spent on a particular topic?")
     # topic_list = ["Divorce", "Criminal", "Bankruptcy", "Real Estate", "Tax"]
     topic_list_query = """
@@ -283,7 +278,7 @@ if selected == "Clients":
     for i, topic in enumerate(topics):
         st.write(topic[i])
 
-    st.markdown("---")
+    horizontal_line()
     st.markdown("### What is the phone number of a client's contact?")
     selected_client = st.selectbox("Select a client", client_list_names, key="client02")
 
@@ -319,7 +314,12 @@ if selected == "Clients":
             st.write("**Name:**", contact[0], contact[1])
             st.write("**Phone:**", contact[2])
             st.write(contact[3])
-            st.markdown("---")
+            horizontal_line()
+
+    # TODO outstanding balances
+    horizontal_line()
+
+
 # --------------------------------- Research page ------------------------------------
 
 if selected == "Research":
@@ -361,11 +361,4 @@ if selected == "Courts":
     except IndexError or ValueError:
         st.write("### **ERROR:** Case number: ", case_num, " was not tried in any court.")
 
-    st.markdown("---")
-
-
-
-
-
-
-
+    horizontal_line()
