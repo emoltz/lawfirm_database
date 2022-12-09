@@ -83,6 +83,7 @@ if sidebar_selection == "Home":
 
 # --------------------------------- Lawyers page --------------------------------------
 if sidebar_selection == "Lawyers":
+    # TODO add two more queries for lawyers
     page_intro(sidebar_selection)
 
     # lawyer1 = Laywer("Ethan", "Hunt")
@@ -233,11 +234,12 @@ if sidebar_selection == "Cases":
     selection = st.selectbox("Select a topic", topic_list)
 
     hours_spent_on_topic_query = f"""
-    SELECT	c.topic, sum(w.hours) as hours_spent
-    FROM		cases c, works_on w
-    WHERE 	c.case_id = w.case_id
-    AND 		c.topic = '{selection}'
-    GROUP BY	c.topic;"""
+        SELECT	c.topic, sum(w.hours) as hours_spent
+        FROM		cases c, works_on w
+        WHERE 	c.case_id = w.case_id
+        AND 		c.topic = '{selection}'
+        GROUP BY	c.topic;
+    """
 
     try:
         hours_spent_on_topic = run_query(hours_spent_on_topic_query)
@@ -414,7 +416,6 @@ if sidebar_selection == "Courts":
     selected_judge_lastName = selected_judge.split()[1]
 
     try:
-
         number_of_times_query = f"""
         SELECT count(c.topic)
         FROM judges j,
