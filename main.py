@@ -140,33 +140,37 @@ if sidebar_selection == "Lawyers & Cases":
     horizontal_line()
 
     st.markdown("### Look up information about a case from the `CaseID`")
-    case_num = st.number_input("Case ID", min_value=1, max_value=5)
+    total_cases_query = "SELECT COUNT(*) from cases;"
+    total_cases = run_query(total_cases_query)
+
+    case_num = st.number_input("Case ID", min_value=1, max_value=total_cases[0][0])
     date_of_case_query = f"""
             SELECT	date_closed
             FROM cases
             WHERE 	case_id = {case_num}	
-    """
+            """
 
     verdict_query = f"""
          SELECT	verdict
          FROM		cases
          WHERE 	case_id = {case_num}
-    """
-    # TODO get rid of tabs (don't work on jedi)
-    tabs = st.tabs(["Date", "Verdict", "Topic", "Managed By", "Lawyers Involved"])
-    columns = st.columns(2)
+        """
+
+    columns = st.columns(4)
     try:
         verdict_of_case = run_query(verdict_query)
         date_of_case = run_query(date_of_case_query)
-        with tabs[0]:
+        with columns[0]:
+            st.write("**Date of Case**")
             st.write(date_of_case[0][0])
-        with tabs[1]:
+        with columns[1]:
+            st.write("**Verdict**")
             st.write(verdict_of_case[0][0].title())
-        with tabs[2]:
+        with columns[2]:
+            st.write("**Judge**")
             st.write("TODO")
-        with tabs[3]:
-            st.write("TODO")
-        with tabs[4]:
+        with columns[3]:
+            st.write("**Managed By**")
             st.write("TODO")
     except IndexError or ValueError:
         st.markdown("## A case with that ID doesn't exist!")
