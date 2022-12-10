@@ -70,7 +70,15 @@ class FakeContacts:
     type_of_relation = ""
     relationship_provider = DynamicProvider(
         provider_name="relationship_provider",
-        elements=["mother", "father", "son", "daughter", "cousin", "friend", "neighbor"],
+        elements=[
+            "mother",
+            "father",
+            "son",
+            "daughter",
+            "cousin",
+            "friend",
+            "neighbor",
+        ],
     )
     client_ids = []
 
@@ -135,6 +143,7 @@ cur = conn.cursor()
 
 
 # FUNCTIONS:
+
 
 def populate_judge_table():
     judge_list = []
@@ -201,4 +210,3 @@ def populate_contacts_table(amount=25):
 # populate_paralegal_table()
 # populate_judge_table()
 populate_contacts_table(100)
-

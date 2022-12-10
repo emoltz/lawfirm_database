@@ -49,7 +49,7 @@ conn = init_connection()
 
 def page_intro(page_name):
     st.title(f"Welcome to the {page_name} Page")
-    st.write('*Please use the left menu to navigate these pages*')
+    st.write("*Please use the left menu to navigate these pages*")
     st.markdown("---")
 
 
@@ -68,7 +68,7 @@ with st.sidebar:
     sidebar_selection = option_menu(
         menu_title="Menu",  # required
         options=["Home", "Lawyers & Cases", "Clients", "Courts"],  # required
-        default_index=0
+        default_index=0,
     )
 # --------------------------------- Home page --------------------------------------
 if sidebar_selection == "Home":
@@ -111,7 +111,8 @@ if sidebar_selection == "Lawyers & Cases":
     st.write("You selected:", choice)
     cases_worked_on = run_query(
         # TODO we should also have this grab last name
-        f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = '{first_names[choice_index]}';")
+        f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = '{first_names[choice_index]}';"
+    )
 
     # this query finds the total number of hours worked on by a lawyer using their first and last names
     total_hours_query = f"""
@@ -193,14 +194,17 @@ if sidebar_selection == "Lawyers & Cases":
 
     try:
         cases_closed_between_dates = run_query(cases_closed_between_dates_query)
-        cases_closed_between_dates_df = pd.DataFrame(cases_closed_between_dates,
-                                                     columns=["Case ID", "Topic", "Date Closed"])
+        cases_closed_between_dates_df = pd.DataFrame(
+            cases_closed_between_dates, columns=["Case ID", "Topic", "Date Closed"]
+        )
         st.write(cases_closed_between_dates_df)
     except IndexError or ValueError:
         st.markdown("No cases were closed between those dates!")
 
     horizontal_line()
-    st.markdown("### How many cases were there that made over the selected amount of money?")
+    st.markdown(
+        "### How many cases were there that made over the selected amount of money?"
+    )
     number_input = st.number_input("Amount of money", value=1.00, step=0.50)
 
     cases_over_amount_query = f"""
@@ -340,10 +344,21 @@ if sidebar_selection == "Clients":
     columns = st.columns(2)
     client_delta = -1
     with columns[0]:
-        st.metric("Outstanding Balances", client_outstanding_balance[0][0], delta=client_delta)
+        st.metric(
+            "Outstanding Balances", client_outstanding_balance[0][0], delta=client_delta
+        )
     with columns[1]:
-        st.metric("Fully Paid Clients", total_clients[0][0] - client_outstanding_balance[0][0], delta=-1 * client_delta)
-    st.bar_chart(data=[client_outstanding_balance[0][0], total_clients[0][0] - client_outstanding_balance[0][0]])
+        st.metric(
+            "Fully Paid Clients",
+            total_clients[0][0] - client_outstanding_balance[0][0],
+            delta=-1 * client_delta,
+        )
+    st.bar_chart(
+        data=[
+            client_outstanding_balance[0][0],
+            total_clients[0][0] - client_outstanding_balance[0][0],
+        ]
+    )
 
 # --------------------------------- Research page ------------------------------------
 
@@ -381,7 +396,13 @@ if sidebar_selection == "Courts":
             judges_list_names.append(name[0] + " " + name[1])
 
         judge_name = judges_list_names
-        st.write("The presiding judge for case number ", case_num, " was the honorable", judge_name[0], ".")
+        st.write(
+            "The presiding judge for case number ",
+            case_num,
+            " was the honorable",
+            judge_name[0],
+            ".",
+        )
 
     except IndexError or ValueError:
         st.write("### Case number: ", case_num, " was not tried in any court.")
@@ -389,7 +410,9 @@ if sidebar_selection == "Courts":
     horizontal_line()
 
     # how many cases has [judge] presided over that dealth with [topic]?
-    st.markdown("### How many cases has a judge presided over that dealt with a specific topic?")
+    st.markdown(
+        "### How many cases has a judge presided over that dealt with a specific topic?"
+    )
     judge_list_query = """
         SELECT distinct j.firstname, j.lastname from judges j;
     """
@@ -429,7 +452,12 @@ if sidebar_selection == "Courts":
 
         number_of_times = run_query(number_of_times_query)
 
-        st.metric(f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:",
-                  number_of_times[0][0])
+        st.metric(
+            f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:",
+            number_of_times[0][0],
+        )
     except IndexError or ValueError:
-        st.metric(f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:", 0)
+        st.metric(
+            f"Number of times {selected_judge} has presided over topic {selected_topic.lower()}:",
+            0,
+        )
