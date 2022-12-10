@@ -67,7 +67,7 @@ def run_query(query):
 with st.sidebar:
     sidebar_selection = option_menu(
         menu_title="Menu",  # required
-        options=["Home", "Lawyers", "Cases", "Clients", "Courts"],  # required
+        options=["Home", "Lawyers & Cases", "Clients", "Courts"],  # required
         default_index=0
     )
 # --------------------------------- Home page --------------------------------------
@@ -82,7 +82,7 @@ if sidebar_selection == "Home":
     st_lottie(lottie_json, speed=1, height=300, key="initial")
 
 # --------------------------------- Lawyers page --------------------------------------
-if sidebar_selection == "Lawyers":
+if sidebar_selection == "Lawyers & Cases":
     # TODO add two more queries for lawyers
     page_intro(sidebar_selection)
 
@@ -137,10 +137,7 @@ if sidebar_selection == "Lawyers":
             st.metric("Total hours worked on all cases", total_hours_worked[0][0])
     except IndexError:
         st.write("Query did not work. ")
-
-# --------------------------------- Cases page --------------------------------------
-if sidebar_selection == "Cases":
-    page_intro(sidebar_selection)
+    horizontal_line()
 
     st.markdown("### Look up information about a case from the `CaseID`")
     case_num = st.number_input("Case ID", min_value=1, max_value=5)
