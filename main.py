@@ -83,7 +83,6 @@ if sidebar_selection == "Home":
 
 # --------------------------------- Lawyers page --------------------------------------
 if sidebar_selection == "Lawyers & Cases":
-    # TODO add two more queries for lawyers
     page_intro(sidebar_selection)
 
     # lawyer1 = Laywer("Ethan", "Hunt")
@@ -205,14 +204,14 @@ if sidebar_selection == "Lawyers & Cases":
     number_input = st.number_input("Amount of money", value=1.00, step=0.50)
 
     cases_over_amount_query = f"""
-    SELECT COUNT(*)
-    FROM cases c,
-        lawyers l,
-         works_on w
-    WHERE w.lid = l.lid
-    AND w.case_id = c.case_id
-    AND ((w.hours * l.rate_per_hour) > {number_input});
-  """
+        SELECT COUNT(*)
+        FROM cases c,
+            lawyers l,
+             works_on w
+        WHERE w.lid = l.lid
+        AND w.case_id = c.case_id
+        AND ((w.hours * l.rate_per_hour) > {number_input});
+      """
 
     try:
         cases_over_amount = run_query(cases_over_amount_query)
