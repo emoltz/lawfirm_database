@@ -43,7 +43,7 @@ class FakeLawyer:
 class FakeCase:
     fake = Faker()
     case_id = 0
-    case_topic = ""
+    topic = ""
     date_closed = ""
     paid = True
     verdict = ""
@@ -76,16 +76,17 @@ class FakeCase:
     )
 
     def __init__(self):
+        self.get_lawyer_ids()
+        self.get_judge_ids()
         self.fake.add_provider(self.topic_provider)
         self.fake.add_provider(self.verdict_provider)
         self.case_id = self.fake.unique.random_int(min=0, max=10000)
         self.paid = self.fake.boolean(chance_of_getting_true=50)
-        self.case_topic = self.fake.topic_provider()
+        self.topic = self.fake.topic_provider()
         self.date_closed = self.fake.date_between(start_date="-10y", end_date="today")
         self.verdict = self.fake.verdict_provider()
-        # TODO something is wrong here
-        self.managed_by = self.fake.random_element(self.lawyer_id)
-        self.presided_by = self.fake.random_element(self.judge_id)
+        self.managed_by = int(self.fake.random_element(self.lawyer_id))
+        self.presided_by = int(self.fake.random_element(self.judge_id))
 
     def get_lawyer_ids(self):
         query = "SELECT lid FROM lawyers"
@@ -307,7 +308,7 @@ def populate_part_of_table(amount=15):
 def populate_cases_table(amount=15):
     for _ in range(amount):
         case = FakeCase()
-        query = f"INSERT INTO cases (case_id, topic, date_closed, paid, verdict, managed_by, presided_by) VALUES ({case.case_id}, '{case.case_topic}', '{case.date_closed}', '{case.paid}', '{case.managed_by}', '{case.presided_by}')"
+        query = f"INSERT INTO cases (case_id, topic, date_closed, paid, verdict, managed_by, presided_by) VALUES ('{case.case_id}','{case.topic}', '{case.date_closed}','{case.paid}', '{case.verdict}', '{case.managed_by}', '{case.presided_by}')"
         connect_to_database_and_insert(query)
 
 
