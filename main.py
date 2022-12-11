@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 import streamlit as st
 import pandas as pd
@@ -179,7 +181,7 @@ if sidebar_selection == "Lawyers & Cases":
     st.markdown("### What cases were closed between two dates?")
     columns = st.columns(2)
     with columns[0]:
-        start_date = st.date_input("Start Date")
+        start_date = st.date_input("Start Date", datetime.date(2021, 1, 1))
         start_date_string = str(start_date.strftime("%Y-%m-%d"))
     with columns[1]:
         end_date = st.date_input("End Date")
