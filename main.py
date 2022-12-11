@@ -94,7 +94,8 @@ if sidebar_selection == "Lawyers & Cases":
     # this gets the names from the lawyers table
     query = run_query("SELECT firstName, lastName from lawyers;")
     lawyer_list = []
-    # this puts them into three lists: one with the lawyers first and last names, and the other two with their first and last names isolated
+    # this puts them into three lists: one with the lawyers first and last names, and the other two with their first
+    # and last names isolated
     for i in range(0, len(query)):
         first_names.append(query[i][0])
         last_names.append(query[i][1])
@@ -105,15 +106,15 @@ if sidebar_selection == "Lawyers & Cases":
     choice = st.selectbox("Select a Lawyer", lawyer_list, index=0)
     choice_index = None
 
-    # this is so we can isolate the first/last names of the lawyer. There's a better way to do this with string slicing but we can handle that later.
+    # this is so we can isolate the first/last names of the lawyer. There's a better way to do this with string
+    # slicing but we can handle that later.
     for i in range(0, len(lawyer_list)):
         if choice == lawyer_list[i]:
             choice_index = i
 
     st.write("You selected:", choice)
     cases_worked_on = run_query(
-        # TODO we should also have this grab last name
-        f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = '{first_names[choice_index]}';"
+        f"SELECT COUNT(*) from lawyers l, cases c, works_on w where l.lid = w.lid and c.case_id = w.case_id and l.firstName = '{first_names[choice_index]}' and l.lastname = '{last_names[choice_index]}' ;"
     )
 
     # this query finds the total number of hours worked on by a lawyer using their first and last names
@@ -145,7 +146,7 @@ if sidebar_selection == "Lawyers & Cases":
     total_cases_query = "SELECT COUNT(*) from cases;"
     total_cases = run_query(total_cases_query)
 
-    case_num = st.number_input("Case ID", min_value=1, max_value=total_cases[0][0])
+    case_num = st.number_input("Case ID", min_value=1, max_value=10000)
     date_of_case_query = f"""
             SELECT	date_closed
             FROM cases
@@ -158,10 +159,27 @@ if sidebar_selection == "Lawyers & Cases":
          WHERE 	case_id = {case_num}
         """
 
+    judge_of_case_query = f"""
+        select j.firstname, j.lastname
+        from cases c, judges j
+        where c.presided_by = j.judgeid
+        and c.case_id = {case_num}
+        """
+
+    managed_by_query = f"""
+        select l.firstname, l.lastname
+        from cases c,
+            lawyers l
+        where c.managed_by = l.lid
+        and c.case_id = {case_num}
+        """
+
     columns = st.columns(4)
     try:
         verdict_of_case = run_query(verdict_query)
         date_of_case = run_query(date_of_case_query)
+        judge_of_case = run_query(judge_of_case_query)
+        managed_by = run_query(managed_by_query)
         with columns[0]:
             st.write("**Date of Case**")
             st.write(date_of_case[0][0])
@@ -170,10 +188,10 @@ if sidebar_selection == "Lawyers & Cases":
             st.write(verdict_of_case[0][0].title())
         with columns[2]:
             st.write("**Judge**")
-            st.write("TODO")
+            st.write(judge_of_case[0][0] + " " + judge_of_case[0][1])
         with columns[3]:
             st.write("**Managed By**")
-            st.write("TODO")
+            st.write(managed_by[0][0] + " " + managed_by[0][1])
     except IndexError or ValueError:
         st.markdown("## A case with that ID doesn't exist!")
 
@@ -313,11 +331,9 @@ if sidebar_selection == "Clients":
         st.markdown("**Contacts:**")
     # st.write(contacts_list)
 
-    try:
-        num_of_columns = len(contacts_list)
-        columns = st.columns(num_of_columns)
-    except:
-        pass
+    num_of_columns = len(contacts_list)
+    columns = st.columns(num_of_columns)
+
     for i, contact in enumerate(contacts_list):
         with columns[i]:
             st.write("**Name:**", contact[0], contact[1])

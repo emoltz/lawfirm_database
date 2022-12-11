@@ -62,7 +62,7 @@ class FakeCase:
             "Criminal",
             "Traffic",
             "Bankruptcy",
-        ]
+        ],
     )
     verdict_provider = DynamicProvider(
         provider_name="verdict_provider",
@@ -72,7 +72,7 @@ class FakeCase:
             "Dismissed",
             "Settled",
             "Continued",
-        ]
+        ],
     )
 
     def __init__(self):
@@ -297,7 +297,10 @@ def populate_part_of_table(amount=15):
         case_id_temp = fake.random_element(case_ids)
         client_id_temp = int(client_id_temp)
         case_id_temp = int(case_id_temp)
-        if client_id_temp not in already_used_client_ids and case_id_temp not in already_used_case_ids:
+        if (
+            client_id_temp not in already_used_client_ids
+            and case_id_temp not in already_used_case_ids
+        ):
             query = f"INSERT INTO part_of (client_id, case_id) VALUES ({client_id_temp}, {case_id_temp})"
             connect_to_database_and_insert(query)
         already_used_case_ids.append(case_id_temp)
@@ -310,6 +313,13 @@ def populate_cases_table(amount=15):
         case = FakeCase()
         query = f"INSERT INTO cases (case_id, topic, date_closed, paid, verdict, managed_by, presided_by) VALUES ('{case.case_id}','{case.topic}', '{case.date_closed}','{case.paid}', '{case.verdict}', '{case.managed_by}', '{case.presided_by}')"
         connect_to_database_and_insert(query)
+
+
+# TODO populate works_on table
+
+
+def populate_works_on_table(amount=30):
+    pass
 
 
 # ----------- SCRIPTS: Uncomment to run  -----
