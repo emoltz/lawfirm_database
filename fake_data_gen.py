@@ -2,6 +2,21 @@ from faker import Faker
 import streamlit as st
 import psycopg2
 from faker.providers import DynamicProvider
+import numpy as np
+
+
+def connect_to_database_return_query(query):
+    conn = psycopg2.connect(**st.secrets["postgres"])
+    cur = conn.cursor()
+    cur.execute(query)
+    return cur.fetchall()
+
+
+def connect_to_database_and_insert(query):
+    conn = psycopg2.connect(**st.secrets["postgres"])
+    cur = conn.cursor()
+    cur.execute(query)
+    conn.commit()
 
 
 # CLASSES:
@@ -23,6 +38,64 @@ class FakeLawyer:
         self.email = fake.email()
         self.specialty = fake.word()
         self.rate_per_hour = fake.random_int(min=1, max=500)
+
+
+class FakeCase:
+    fake = Faker()
+    case_id = 0
+    case_topic = ""
+    date_closed = ""
+    paid = True
+    verdict = ""
+    managed_by = 0  # foreign key - lawyers
+    lawyer_id = []
+    presided_by = 0  # foreign key - judges
+    judge_id = []
+    topic_provider = DynamicProvider(
+        provider_name="topic_provider",
+        elements=[
+            "Divorce",
+            "Child Custody",
+            "Child Support",
+            "Estate Planning",
+            "Real Estate",
+            "Criminal",
+            "Traffic",
+            "Bankruptcy",
+        ]
+    )
+    verdict_provider = DynamicProvider(
+        provider_name="verdict_provider",
+        elements=[
+            "Guilty",
+            "Not Guilty",
+            "Dismissed",
+            "Settled",
+            "Continued",
+        ]
+    )
+
+    def __init__(self):
+        self.fake.add_provider(self.topic_provider)
+        self.fake.add_provider(self.verdict_provider)
+        self.case_id = self.fake.unique.random_int(min=0, max=10000)
+        self.paid = self.fake.boolean(chance_of_getting_true=50)
+        self.case_topic = self.fake.topic_provider()
+        self.date_closed = self.fake.date_between(start_date="-10y", end_date="today")
+        self.verdict = self.fake.verdict_provider()
+        # TODO something is wrong here
+        self.managed_by = self.fake.random_element(self.lawyer_id)
+        self.presided_by = self.fake.random_element(self.judge_id)
+
+    def get_lawyer_ids(self):
+        query = "SELECT lid FROM lawyers"
+        self.lawyer_id = connect_to_database_return_query(query)
+        self.lawyer_id = np.array(self.lawyer_id)
+
+    def get_judge_ids(self):
+        query = "SELECT judgeid FROM judges"
+        self.judge_id = connect_to_database_return_query(query)
+        self.judge_id = np.array(self.judge_id)
 
 
 class FakeLawfirm:
@@ -183,7 +256,7 @@ def populate_client_table():
         conn.commit()
 
 
-def populate_laywer_table():
+def populate_lawyer_table():
     lawfirm = FakeLawfirm()
     for lawyer in lawfirm.list_of_lawyers:
         cur.execute(
@@ -203,10 +276,47 @@ def populate_contacts_table(amount=25):
         conn.commit()
 
 
+def populate_part_of_table(amount=15):
+    # so I need to get the client IDs and the case IDs and then randomly assign
+    fake = Faker()
+
+    id_query = "SELECT cid from clients;"
+    case_id_query = "select case_id from cases;"
+    client_ids = connect_to_database_return_query(id_query)
+    case_ids = connect_to_database_return_query(case_id_query)
+    client_ids = np.asarray(client_ids)
+    case_ids = np.asarray(case_ids)
+
+    already_used_client_ids = []
+    already_used_case_ids = []
+
+    for _ in range(amount):
+        # insert into part_of table random cids
+        client_id_temp = fake.random_element(client_ids)
+        case_id_temp = fake.random_element(case_ids)
+        client_id_temp = int(client_id_temp)
+        case_id_temp = int(case_id_temp)
+        if client_id_temp not in already_used_client_ids and case_id_temp not in already_used_case_ids:
+            query = f"INSERT INTO part_of (client_id, case_id) VALUES ({client_id_temp}, {case_id_temp})"
+            connect_to_database_and_insert(query)
+        already_used_case_ids.append(case_id_temp)
+        already_used_client_ids.append(client_id_temp)
+
+
+# generate cases table
+def populate_cases_table(amount=15):
+    for _ in range(amount):
+        case = FakeCase()
+        query = f"INSERT INTO cases (case_id, topic, date_closed, paid, verdict, managed_by, presided_by) VALUES ({case.case_id}, '{case.case_topic}', '{case.date_closed}', '{case.paid}', '{case.managed_by}', '{case.presided_by}')"
+        connect_to_database_and_insert(query)
+
+
 # ----------- SCRIPTS: Uncomment to run-----
 
-# populate_laywer_table()
+# populate_lawyer_table()
 # populate_client_table()
 # populate_paralegal_table()
 # populate_judge_table()
-populate_contacts_table(100)
+# populate_contacts_table(100)
+# populate_part_of_table()
+populate_cases_table()
