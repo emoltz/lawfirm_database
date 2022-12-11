@@ -312,7 +312,7 @@ def populate_cases_table(amount=15):
         connect_to_database_and_insert(query)
 
 
-# ----------- SCRIPTS: Uncomment to run-----
+# ----------- SCRIPTS: Uncomment to run  -----
 
 # populate_lawyer_table()
 # populate_client_table()
@@ -320,4 +320,4 @@ def populate_cases_table(amount=15):
 # populate_judge_table()
 # populate_contacts_table(100)
 # populate_part_of_table()
-populate_cases_table()
+# populate_cases_table()
