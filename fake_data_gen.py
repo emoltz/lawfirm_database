@@ -298,8 +298,8 @@ def populate_part_of_table(amount=15):
         client_id_temp = int(client_id_temp)
         case_id_temp = int(case_id_temp)
         if (
-            client_id_temp not in already_used_client_ids
-            and case_id_temp not in already_used_case_ids
+                client_id_temp not in already_used_client_ids
+                and case_id_temp not in already_used_case_ids
         ):
             query = f"INSERT INTO part_of (client_id, case_id) VALUES ({client_id_temp}, {case_id_temp})"
             connect_to_database_and_insert(query)
@@ -315,11 +315,25 @@ def populate_cases_table(amount=15):
         connect_to_database_and_insert(query)
 
 
-# TODO populate works_on table
-
-
 def populate_works_on_table(amount=30):
-    pass
+    # get list of case ids
+    # get list of laywer ids
+    # generate random number for hours
+    # insert into works_on table
+    fake = Faker()
+    case_id_query = "select case_id from cases;"
+    lawyer_id_query = "select lid from lawyers;"
+    case_ids = connect_to_database_return_query(case_id_query)
+    lawyer_ids = connect_to_database_return_query(lawyer_id_query)
+    case_ids = np.asarray(case_ids)
+    lawyer_ids = np.asarray(lawyer_ids)
+
+    for _ in range(amount):
+        case_id_temp = int(fake.random_element(case_ids))
+        lawyer_id_temp = int(fake.random_element(lawyer_ids))
+        hours_temp = fake.random_int(min=1, max=100)
+        query = f"INSERT INTO works_on (case_id, lid, hours) VALUES ({case_id_temp}, {lawyer_id_temp}, {hours_temp})"
+        connect_to_database_and_insert(query)
 
 
 # ----------- SCRIPTS: Uncomment to run  -----
@@ -331,3 +345,4 @@ def populate_works_on_table(amount=30):
 # populate_contacts_table(100)
 # populate_part_of_table()
 # populate_cases_table()
+populate_works_on_table()
