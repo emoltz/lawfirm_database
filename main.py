@@ -277,7 +277,7 @@ if sidebar_selection == "Clients":
 
     st.markdown("### What was the topic of the case that a client was involved in?")
     client_list_query = """
-     SELECT distinct c.firstname, c.lastname from clients c;
+     SELECT c.firstname, c.lastname from clients c;
     """
 
     client_list = run_query(client_list_query)
@@ -301,9 +301,13 @@ if sidebar_selection == "Clients":
         AND 		(cl.firstname = '{first_name}' AND cl.lastname = '{last_name}')
         """
     topics = run_query(query)
+    if len(topics) > 0:
+        for topic in topics:
+            st.write(topic[0])
+    else:
+        st.write("No current or past cases found for this client")
 
-    for i, topic in enumerate(topics):
-        st.write(topic[i])
+
 
     horizontal_line()
     st.markdown("### What is the phone number of a client's contact?")
@@ -326,12 +330,13 @@ if sidebar_selection == "Clients":
     #
     contacts_list = run_query(contacts_query)
     if not contacts_list:
-        st.markdown("No contacts for this client!")
+        st.warning("No contacts for this client!")
     else:
         st.markdown("**Contacts:**")
-    # st.write(contacts_list)
 
     num_of_columns = len(contacts_list)
+    if num_of_columns == 0:
+        num_of_columns = 1
     columns = st.columns(num_of_columns)
 
     for i, contact in enumerate(contacts_list):
@@ -388,7 +393,7 @@ if sidebar_selection == "Courts":
     page_intro(sidebar_selection)
 
     st.markdown("### Look up courts based on `CaseID`")
-    case_num = st.number_input("Case ID", min_value=1, max_value=5)
+    case_num = st.number_input("Case ID", min_value=1, max_value=10000)
     court_query = f"""
                 SELECT	j.court
                 FROM judges j, cases c

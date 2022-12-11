@@ -277,7 +277,7 @@ def populate_contacts_table(amount=25):
         conn.commit()
 
 
-def populate_part_of_table(amount=15):
+def populate_part_of_table():
     # so I need to get the client IDs and the case IDs and then randomly assign
     fake = Faker()
 
@@ -291,20 +291,13 @@ def populate_part_of_table(amount=15):
     already_used_client_ids = []
     already_used_case_ids = []
 
-    for _ in range(amount):
+    for individual_id in client_ids:
         # insert into part_of table random cids
-        client_id_temp = fake.random_element(client_ids)
         case_id_temp = fake.random_element(case_ids)
-        client_id_temp = int(client_id_temp)
+        client_id_temp = int(individual_id[0])
         case_id_temp = int(case_id_temp)
-        if (
-                client_id_temp not in already_used_client_ids
-                and case_id_temp not in already_used_case_ids
-        ):
-            query = f"INSERT INTO part_of (client_id, case_id) VALUES ({client_id_temp}, {case_id_temp})"
-            connect_to_database_and_insert(query)
-        already_used_case_ids.append(case_id_temp)
-        already_used_client_ids.append(client_id_temp)
+        query = f"INSERT INTO part_of (client_id, case_id) VALUES ({client_id_temp}, {case_id_temp})"
+        connect_to_database_and_insert(query)
 
 
 # generate cases table
@@ -343,6 +336,6 @@ def populate_works_on_table(amount=30):
 # populate_paralegal_table()
 # populate_judge_table()
 # populate_contacts_table(100)
-# populate_part_of_table()
+populate_part_of_table()
 # populate_cases_table()
-populate_works_on_table()
+# populate_works_on_table()
