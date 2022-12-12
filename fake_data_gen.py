@@ -457,15 +457,21 @@ def populate_file_table(amount=30):
 
 # ----------- SCRIPTS: Uncomment to run  -----
 
-# populate_file_table()
-# populate_associated_with_table()
-# populate_research_table()
-# populate_document_forms_table()
-# populate_lawyer_table()
-# populate_client_table()
-# populate_paralegal_table()
-# populate_judge_table()
-# populate_contacts_table(100)
-# populate_part_of_table()
-# populate_cases_table()
-# populate_works_on_table()
+def populate_database():
+    # need to figure out the order of the functions
+    populate_contacts_table(100)
+    populate_lawyer_table()
+    populate_cases_table()
+    populate_client_table()
+    populate_judge_table()
+    populate_research_table()
+
+    populate_file_table()
+    populate_associated_with_table()
+    populate_document_forms_table()
+    populate_paralegal_table()
+    populate_part_of_table()
+    populate_works_on_table()
+
+
+populate_database()
