@@ -186,7 +186,7 @@ class FakeParalegal:
     speciality = ""
     firstname = ""
     lastname = ""
-    assigned_to_case = 0
+    assigned_to_case = 0  # TODO make this dynamic
 
     def __init__(self):
         fake = Faker()
@@ -336,6 +336,6 @@ def populate_works_on_table(amount=30):
 # populate_paralegal_table()
 # populate_judge_table()
 # populate_contacts_table(100)
-populate_part_of_table()
+# populate_part_of_table()
 # populate_cases_table()
 # populate_works_on_table()

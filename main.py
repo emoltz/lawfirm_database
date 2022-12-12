@@ -1,5 +1,3 @@
-import datetime
-
 import requests
 import streamlit as st
 import pandas as pd
@@ -306,8 +304,6 @@ if sidebar_selection == "Clients":
             st.write(topic[0])
     else:
         st.write("No current or past cases found for this client")
-
-
 
     horizontal_line()
     st.markdown("### What is the phone number of a client's contact?")
