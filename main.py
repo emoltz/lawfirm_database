@@ -1,3 +1,4 @@
+import datetime
 import requests
 import streamlit as st
 import pandas as pd
@@ -44,7 +45,6 @@ def get_first_last_names_from_query(query):
     return list_names
 
 
-conn = init_connection()
 
 
 def page_intro(page_name):
@@ -57,6 +57,7 @@ def horizontal_line():
     st.markdown("---")
 
 
+conn = init_connection()
 @st.experimental_memo(ttl=600)
 def run_query(query):
     with conn.cursor() as cur:
