@@ -45,8 +45,6 @@ def get_first_last_names_from_query(query):
     return list_names
 
 
-
-
 def page_intro(page_name):
     st.title(f"Welcome to the {page_name} Page")
     st.write("*Please use the left menu to navigate these pages*")
@@ -58,6 +56,8 @@ def horizontal_line():
 
 
 conn = init_connection()
+
+
 @st.experimental_memo(ttl=600)
 def run_query(query):
     with conn.cursor() as cur:
@@ -68,7 +68,7 @@ def run_query(query):
 with st.sidebar:
     sidebar_selection = option_menu(
         menu_title="Menu",  # required
-        options=["Home", "Lawyers & Cases", "Clients", "Courts"],  # required
+        options=["Home", "Lawyers & Cases", "Clients", "Research", "Courts"],  # required
         default_index=0,
     )
 # --------------------------------- Home page --------------------------------------
@@ -382,8 +382,64 @@ if sidebar_selection == "Clients":
 
 # --------------------------------- Research page ------------------------------------
 
-# if selected == "Research":
-#     page_intro(selected)
+if sidebar_selection == "Research":
+    page_intro(sidebar_selection)
+
+    # what documents or forms were used in a specific case?
+    st.markdown("### What documents or forms were used in a specific case?")
+    case_list_query = "select case_id, topic from cases;"
+    case_list = run_query(case_list_query)
+    case_list_names = []
+    for case in case_list:
+        case_list_names.append("ID: " + str(case[0]) + " | Topic:  " + case[1])
+
+    selected_case = st.selectbox("Select a case", case_list_names, key="case01")
+
+    # get the id of the case
+    case_id = int(selected_case.split()[1])
+    find_documents_query = f"""
+    SELECT	d.title as document_title
+FROM		documents_forms d, associated_with a, cases c 
+WHERE 	d.did = a.did
+AND 		c.case_id = a.case_id
+AND 		c.case_id = {case_id};
+    """
+    documents = run_query(find_documents_query)
+    # list documents
+    if len(documents) > 0:
+        st.markdown("**Documents:**")
+        for document in documents:
+            st.markdown(document[0])
+    else:
+        st.warning("No documents found for this case")
+
+    # what documents were used in cases related to "topic"?
+
+    horizontal_line()
+    st.markdown("### What documents were used in cases related to a specific topic?")
+    topic_list_query = "select distinct topic from cases;"
+    topic_list = run_query(topic_list_query)
+    topic_list_names = []
+    for topic in topic_list:
+        topic_list_names.append(topic[0])
+
+    selected_topic = st.selectbox("Select a topic", topic_list_names, key="topic01")
+    # find documents related to this topic
+    find_documents_query = f"""
+        SELECT	distinct d.title as document_title
+        FROM		documents_forms d, associated_with a, cases c
+        WHERE 	d.did = a.did
+        AND 		c.case_id = a.case_id
+        AND 		c.topic = '{selected_topic}';
+    """
+    documents = run_query(find_documents_query)
+    # list documents
+    if len(documents) > 0:
+        st.markdown("**Documents:**")
+        for document in documents:
+            st.markdown(document[0])
+    else:
+        st.warning("No documents found for this topic")
 
 # --------------------------------- Courts page --------------------------------------
 if sidebar_selection == "Courts":
