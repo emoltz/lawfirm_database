@@ -303,7 +303,7 @@ cur = conn.cursor()
 
 def populate_judge_table():
     judge_list = []
-    for _ in range(5):
+    for _ in range(20):
         judge_list.append(FakeJudge())
     for judge in judge_list:
         cur.execute(
