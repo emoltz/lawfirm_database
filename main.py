@@ -237,7 +237,7 @@ if sidebar_selection == "Lawyers & Cases":
     st.markdown(
         "### How many cases were there that made over the selected amount of money?"
     )
-    number_input = st.number_input("Amount of money", value=1.00, step=0.50)
+    number_input = st.number_input("Amount of money", value=1000.00, step=0.50)
 
     cases_over_amount_query = f"""
         SELECT COUNT(*)
