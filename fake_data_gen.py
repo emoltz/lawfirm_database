@@ -187,14 +187,24 @@ class FakeParalegal:
     firstname = ""
     lastname = ""
     assigned_to_case = 0
+    case_ids = []
+
+    def get_case_ids(self):
+        conn = psycopg2.connect(**st.secrets["postgres"])
+        cur = conn.cursor()
+
+        cur.execute(f"SELECT case_id from cases;")
+        self.case_ids = cur.fetchall()
 
     def __init__(self):
         fake = Faker()
+        self.get_case_ids()
         self.pid = fake.unique.random_int(min=20000, max=30000)
         self.rate_per_hour = fake.random_int(min=1, max=500)
         self.speciality = fake.word()
         self.firstname = fake.first_name()
         self.lastname = fake.last_name()
+        self.assigned_to_case = fake.random_element(self.case_ids)[0]
 
 
 class FakeJudge:
@@ -202,13 +212,85 @@ class FakeJudge:
     judge_id = 0
     firstname = ""
     lastname = ""
+    courts = DynamicProvider(
+        provider_name="courts",
+        elements=[
+            "Supreme Court",
+            "District Court",
+            "County Court",
+            "Family Court",
+            "Criminal Court",
+            "Traffic Court",
+            "Bankruptcy Court",
+        ],
+    )
 
     def __init__(self):
         fake = Faker()
-        self.court = fake.word()
+        fake.add_provider(self.courts)
+        self.court = fake.courts()
         self.judge_id = fake.unique.random_int(min=30000, max=40000)
         self.firstname = fake.first_name()
         self.lastname = fake.last_name()
+
+
+class FakeDocumentsForms:
+    did = 0
+    title = ""
+    is_discovery = False
+    document_titles = DynamicProvider(
+        provider_name="document_titles",
+        elements=[
+            "Affidavit",
+            "Answer",
+            "Appeal",
+            "Bill of Costs",
+            "Bill of Particulars",
+            "Brief",
+            "Certificate of Service",
+            "Complaint",
+            "Counterclaim",
+            "Cross-Complaint",
+            "Declaration",
+            "Deposition",
+        ]
+    )
+
+    def __init__(self):
+        fake = Faker()
+        fake.add_provider(self.document_titles)
+        self.did = fake.unique.random_int(min=0, max=10000)
+        self.title = fake.document_titles()
+        self.is_discovery = fake.boolean(chance_of_getting_true=50)
+
+    def __str__(self):
+        return f"{self.did}, {self.title}, {self.is_discovery}"
+
+
+class FakeResearch:
+    citations = DynamicProvider(
+        provider_name="citations",
+        elements=[
+            "A.2d",
+            "A.C.",
+            "A.C.A.",
+            "A.C.C.",
+            "A.C.C.A.",
+            "A.C.C.C.",
+            "A.C.C.C.A.",
+            "A.C.C.C.C.",
+            "A.C.C.C.C.A."]
+    )
+
+    def __init__(self):
+        fake = Faker()
+        fake.add_provider(self.citations)
+        self.rid = fake.unique.random_int(min=0, max=10000)
+        self.citation = fake.citations()
+        self.text = fake.paragraph(nb_sentences=3, variable_nb_sentences=True)
+
+    def __str__(self):
+        return f"{self.rid}, {self.citation}, {self.text}"
 
 
 # DB CONNECTION
@@ -230,13 +312,13 @@ def populate_judge_table():
         conn.commit()
 
 
-def populate_paralegal_table(number_of_paralegals=5):
+def populate_paralegal_table(number_of_paralegals=20):
     paralegal_list = []
     for _ in range(number_of_paralegals):
         paralegal_list.append(FakeParalegal())
     for paralegal in paralegal_list:
         cur.execute(
-            f"INSERT INTO paralegals (pid, rate_per_hour, specialty, firstname, lastname) VALUES ('{paralegal.pid}', '{paralegal.rate_per_hour}', '{paralegal.speciality}', '{paralegal.firstname}','{paralegal.lastname}')"
+            f"INSERT INTO paralegals (pid, rate_per_hour, specialty, firstname, lastname, assigned_to_case) VALUES ('{paralegal.pid}', '{paralegal.rate_per_hour}', '{paralegal.speciality}', '{paralegal.firstname}','{paralegal.lastname}', '{paralegal.assigned_to_case}')"
         )
         conn.commit()
 
@@ -277,7 +359,7 @@ def populate_contacts_table(amount=25):
         conn.commit()
 
 
-def populate_part_of_table(amount=15):
+def populate_part_of_table():
     # so I need to get the client IDs and the case IDs and then randomly assign
     fake = Faker()
 
@@ -291,20 +373,13 @@ def populate_part_of_table(amount=15):
     already_used_client_ids = []
     already_used_case_ids = []
 
-    for _ in range(amount):
+    for individual_id in client_ids:
         # insert into part_of table random cids
-        client_id_temp = fake.random_element(client_ids)
         case_id_temp = fake.random_element(case_ids)
-        client_id_temp = int(client_id_temp)
+        client_id_temp = int(individual_id[0])
         case_id_temp = int(case_id_temp)
-        if (
-                client_id_temp not in already_used_client_ids
-                and case_id_temp not in already_used_case_ids
-        ):
-            query = f"INSERT INTO part_of (client_id, case_id) VALUES ({client_id_temp}, {case_id_temp})"
-            connect_to_database_and_insert(query)
-        already_used_case_ids.append(case_id_temp)
-        already_used_client_ids.append(client_id_temp)
+        query = f"INSERT INTO part_of (client_id, case_id) VALUES ({client_id_temp}, {case_id_temp})"
+        connect_to_database_and_insert(query)
 
 
 # generate cases table
@@ -336,13 +411,66 @@ def populate_works_on_table(amount=30):
         connect_to_database_and_insert(query)
 
 
+def populate_associated_with_table(amount=30):
+    case_ids = connect_to_database_return_query("select case_id from cases;")
+    research_ids = connect_to_database_return_query("select rid from research;")
+    documents_forms_ids = connect_to_database_return_query("select did from documents_forms;")
+    case_ids = np.asarray(case_ids)
+    research_ids = np.asarray(research_ids)
+    documents_forms_ids = np.asarray(documents_forms_ids)
+    for _ in range(amount):
+        fake = Faker()
+        case_id_temp = int(fake.random_element(case_ids))
+        research_id_temp = int(fake.random_element(research_ids))
+        document_form_id_temp = int(fake.random_element(documents_forms_ids))
+        query = f"INSERT INTO associated_with (case_id, rid, did) VALUES ({case_id_temp}, {research_id_temp}, {document_form_id_temp})"
+        connect_to_database_and_insert(query)
+
+
+def populate_document_forms_table(amount=30):
+    for _ in range(amount):
+        document = FakeDocumentsForms()
+        query = f"INSERT INTO documents_forms (did, title, is_discovery) VALUES ('{document.did}','{document.title}', '{document.is_discovery}')"
+        connect_to_database_and_insert(query)
+
+
+def populate_research_table(amount=30):
+    for _ in range(amount):
+        research = FakeResearch()
+        query = f"INSERT INTO research (rid, text, citation) VALUES ('{research.rid}','{research.text}', '{research.citation}')"
+        connect_to_database_and_insert(query)
+
+
+def populate_file_table(amount=30):
+    fake = Faker()
+    lawyer_ids = connect_to_database_return_query("select lid from lawyers;")
+    document_form_ids = connect_to_database_return_query("select did from documents_forms;")
+    lawyer_ids = np.asarray(lawyer_ids)
+    document_form_ids = np.asarray(document_form_ids)
+    for _ in range(amount):
+        date = fake.date()
+        lawyer_id_temp = int(fake.random_element(lawyer_ids))
+        document_form_id_temp = int(fake.random_element(document_form_ids))
+        query = f"INSERT INTO lawyers_file_docs (date, lawyer, doc_or_form) VALUES ('{date}', {lawyer_id_temp}, {document_form_id_temp})"
+        connect_to_database_and_insert(query)
+
+
 # ----------- SCRIPTS: Uncomment to run  -----
 
-# populate_lawyer_table()
-# populate_client_table()
-# populate_paralegal_table()
-# populate_judge_table()
-# populate_contacts_table(100)
-# populate_part_of_table()
-# populate_cases_table()
-populate_works_on_table()
+def populate_database():
+    populate_cases_table()
+    populate_client_table()
+    populate_lawyer_table()
+    populate_judge_table()
+    populate_contacts_table(100)
+    populate_research_table()
+    populate_document_forms_table()
+    populate_paralegal_table()
+
+    populate_part_of_table()
+    populate_file_table()
+    populate_associated_with_table()
+    populate_works_on_table()
+
+
+populate_database()
