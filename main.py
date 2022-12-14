@@ -100,7 +100,7 @@ if sidebar_selection == "Lawyers & Cases":
         last_names.append(query[i][1])
         lawyer_list.append(query[i][0] + query[i][1])
 
-    st.write("Lookup how many cases a lawyer has worked on:")
+    st.write("Total Hours Per Lawyer, Per Case:")
     # feed the list of lawyers into the dropdown menu
     choice = st.selectbox("Select a Lawyer", lawyer_list, index=0)
     choice_index = None
@@ -139,6 +139,19 @@ if sidebar_selection == "Lawyers & Cases":
             st.metric("Total hours worked on all cases", total_hours_worked[0][0])
     except IndexError:
         st.write("Query did not work. ")
+    
+    query = """
+    with lawyers_not_working as (select lid
+                             from lawyers
+                             except
+                             select lid
+                             from works_on)
+    select count(*)
+    from lawyers_not_working
+    """
+    lawyers_not_working = run_query(query)
+    st.metric("Lawyers Not Working", lawyers_not_working[0][0])
+        
     horizontal_line()
 
     st.markdown("### Look up information about a case from the `CaseID`")
